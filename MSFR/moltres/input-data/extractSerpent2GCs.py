@@ -65,7 +65,7 @@ def makePropertiesDir(outdir, filebase, mapFile, secbranchFile, unimapFile, serp
         try:
             if not secBranch:
                 for coefficient in goodStuff:
-                    with open(outdir+'/'+filebase+'_'+currentMat+'_'+coefficient+'.txt', 'a') as fh:
+                    with open(outdir+'/'+filebase+'_'+currentMat+'_'+coefficient.upper()+'.txt', 'a') as fh:
                         if coefficient == 'lambda' or coefficient == 'betaEff':
                             strData = coeList[currentMat].branches[item].universes[int(
                                 uniMap[currentMat]), 0, 0].gc[goodMap[coefficient]]
@@ -82,7 +82,7 @@ def makePropertiesDir(outdir, filebase, mapFile, secbranchFile, unimapFile, serp
             else:
                 for branch in secBranch:
                     for coefficient in goodStuff:
-                        with open(outdir+'/'+filebase+'_'+currentMat+'_'+branch+'_'+coefficient+'.txt', 'a') as fh:
+                        with open(outdir+'/'+filebase+'_'+currentMat+'_'+branch+'_'+coefficient.upper()+'.txt', 'a') as fh:
                             if coefficient == 'lambda' or coefficient == 'betaEff':
                                 strData = coeList[currentMat].branches[item, branch].universes[int(
                                     uniMap[currentMat]), 0, 0].gc[goodMap[coefficient]]

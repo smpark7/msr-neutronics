@@ -15,7 +15,7 @@ diri_temp=1030
 []
 
 [Mesh]
-  file = '*.msh'
+  file = 'msfr_fuel_core.msh'
 [../]
 
 [Problem]
@@ -69,7 +69,7 @@ diri_temp=1030
   [./pres]
     var_name_base = pre
     block = 'fuel'
-    outlet_boundaries = 'fuel_tops'
+    outlet_boundaries = 'fuel_top'
     u_def = 0
     v_def = ${flow_velocity}
     w_def = 0
@@ -289,42 +289,42 @@ diri_temp=1030
 [BCs]
   [./vacuum_group1]
     type = VacuumConcBC
-    boundary = 'fuel_bottoms fuel_tops struc_bottoms struc_tops outer_wall'
+    boundary = 'fuel_bottom fuel_top struc_bottom struc_top outer_wall'
     variable = group1
   [../]
   [./vacuum_group2]
     type = VacuumConcBC
-    boundary = 'fuel_bottoms fuel_tops struc_bottoms struc_tops outer_wall'
+    boundary = 'fuel_bottom fuel_top struc_bottom struc_top outer_wall'
     variable = group2
   [../]
   [./vacuum_group3]
     type = VacuumConcBC
-    boundary = 'fuel_bottoms fuel_tops struc_bottoms struc_tops outer_wall'
+    boundary = 'fuel_bottom fuel_top struc_bottom struc_top outer_wall'
     variable = group3
   [../]
   [./vacuum_group4]
     type = VacuumConcBC
-    boundary = 'fuel_bottoms fuel_tops struc_bottoms struc_tops outer_wall'
+    boundary = 'fuel_bottom fuel_top struc_bottom struc_top outer_wall'
     variable = group4
   [../]
   [./vacuum_group5]
     type = VacuumConcBC
-    boundary = 'fuel_bottoms fuel_tops struc_bottoms struc_tops outer_wall'
+    boundary = 'fuel_bottom fuel_top struc_bottom struc_top outer_wall'
     variable = group5
   [../]
   [./vacuum_group6]
     type = VacuumConcBC
-    boundary = 'fuel_bottoms fuel_tops struc_bottoms struc_tops outer_wall'
+    boundary = 'fuel_bottom fuel_top struc_bottom struc_top outer_wall'
     variable = group6
   [../]
   [./temp_diri_cg]
-    boundary = 'struc_bottoms fuel_bottoms outer_wall'
+    boundary = 'struc_bottom fuel_bottom outer_wall'
     type = FunctionDirichletBC
     function = 'temp_bc_func'
     variable = temp
   [../]
   [./temp_advection_outlet]
-    boundary = 'fuel_tops'
+    boundary = 'fuel_top'
     type = TemperatureOutflowBC
     variable = temp
     velocity = '0 ${flow_velocity} 0'
@@ -341,32 +341,32 @@ diri_temp=1030
 [Materials]
   [./fuel]
     type = GenericMoltresMaterial
-    property_tables_root = './moltres-input-data/input_data/MSFR_fuel_'
+    property_tables_root = '../input-data/data/msfr_temp_fuel_'
     interp_type = 'spline'
     block = 'fuel'
     prop_names = 'k cp'
-    prop_values = '' 
+    prop_values = '.0553 1967' 
   [../]
   [./rho_fuel]
     type = DerivativeParsedMaterial
     f_name = rho
-    function = ''
+    function = '2.146e-3 * exp(-1.8 * 1.18e-4 * (temp - 922))'
     args = 'temp'
     derivative_order = 1
     block = 'fuel'
   [../]
   [./struc]
     type = GenericMoltresMaterial
-    property_tables_root = './moltres-input-data/input_data/MSFR_struc_'
+    property_tables_root = '../input-data/data/msfr_temp_struc_'
     interp_type = 'spline'
     prop_names = 'k cp'
-    prop_values = '' 
+    prop_values = '.312 1760' 
     block = 'struc'
   [../]
   [./rho_struc]
     type = DerivativeParsedMaterial
     f_name = rho
-    function = ''
+    function = '1.86e-3 * exp(-1.8 * 1.0e-5 * (temp - 922))'
     args = 'temp'
     derivative_order = 1
     block = 'struc'

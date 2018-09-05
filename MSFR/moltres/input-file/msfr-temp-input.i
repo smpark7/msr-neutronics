@@ -15,12 +15,12 @@ diri_temp=1030
 []
 
 [Mesh]
-  file = 'msfr_fuel_core.e'
+  file = 'msfr_fuel_core2.e'
 
   block_id = '4 6'
   block_name = 'fuel struc'
 
-  boundary_id = '12 13 18 19 20'
+  boundary_id = '21 22 23 24 25'
   boundary_name = 'fuel_bottom fuel_top outer_wall struc_bottom struc_top'
 [../]
 
@@ -356,7 +356,7 @@ diri_temp=1030
   [./rho_fuel]
     type = DerivativeParsedMaterial
     f_name = rho
-    function = '2.146e-3 * exp(-1.8 * 1.18e-4 * (temp - 922))'
+    function = '2.146e-3 * exp(-1.8 * 1.18e-4 * (temp - 1030))'
     args = 'temp'
     derivative_order = 1
     block = 'fuel'
@@ -372,7 +372,7 @@ diri_temp=1030
   [./rho_struc]
     type = DerivativeParsedMaterial
     f_name = rho
-    function = '1.86e-3 * exp(-1.8 * 1.0e-5 * (temp - 922))'
+    function = '1.86e-3 * exp(-1.8 * 1.0e-5 * (temp - 1030))'
     args = 'temp'
     derivative_order = 1
     block = 'struc'
@@ -439,10 +439,10 @@ diri_temp=1030
     block = 'fuel'
     outputs = 'exodus console'
   [../]
-  [./temp_moder]
+  [./temp_struc]
     type = ElementAverageValue
     variable = temp
-    block = 'moder'
+    block = 'struc'
     outputs = 'exodus console'
   [../]
   # [./average_fission_heat]

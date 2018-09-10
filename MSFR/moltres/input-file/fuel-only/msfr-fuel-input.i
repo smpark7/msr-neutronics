@@ -15,13 +15,13 @@ diri_temp=1030
 []
 
 [Mesh]
-  file = 'msfr_fuel_core_3d.e'
+  file = 'msfr_fuel_only.e'
 
-  block_id = '1 2'
-  block_name = 'fuel struc'
+  block_id = '1'
+  block_name = 'fuel'
 
-  boundary_id = '22 21 23 24 25'
-  boundary_name = 'fuel_bottom fuel_top outer_wall struc_bottom struc_top'
+  boundary_id = '12 13 11'
+  boundary_name = 'fuel_bottom fuel_top outer_wall'
 [../]
 
 [Problem]
@@ -149,7 +149,7 @@ diri_temp=1030
   [../]
   [./delayed_group2]
     type = DelayedNeutronSource
-    variable = group1
+    variable = group2
     block = 'fuel'
     group_number=2
   [../]
@@ -313,36 +313,36 @@ diri_temp=1030
 [BCs]
   [./vacuum_group1]
     type = VacuumConcBC
-    boundary = 'fuel_bottom fuel_top struc_bottom struc_top outer_wall'
+    boundary = 'fuel_bottom fuel_top outer_wall'
     variable = group1
   [../]
   [./vacuum_group2]
     type = VacuumConcBC
-    boundary = 'fuel_bottom fuel_top struc_bottom struc_top outer_wall'
+    boundary = 'fuel_bottom fuel_top outer_wall'
     variable = group2
   [../]
   [./vacuum_group3]
     type = VacuumConcBC
-    boundary = 'fuel_bottom fuel_top struc_bottom struc_top outer_wall'
+    boundary = 'fuel_bottom fuel_top outer_wall'
     variable = group3
   [../]
   [./vacuum_group4]
     type = VacuumConcBC
-    boundary = 'fuel_bottom fuel_top struc_bottom struc_top outer_wall'
+    boundary = 'fuel_bottom fuel_top outer_wall'
     variable = group4
   [../]
   [./vacuum_group5]
     type = VacuumConcBC
-    boundary = 'fuel_bottom fuel_top struc_bottom struc_top outer_wall'
+    boundary = 'fuel_bottom fuel_top outer_wall'
     variable = group5
   [../]
   [./vacuum_group6]
     type = VacuumConcBC
-    boundary = 'fuel_bottom fuel_top struc_bottom struc_top outer_wall'
+    boundary = 'fuel_bottom fuel_top outer_wall'
     variable = group6
   [../]
   [./temp_diri_cg]
-    boundary = 'struc_bottom fuel_bottom outer_wall'
+    boundary =  'fuel_bottom outer_wall'
     type = FunctionDirichletBC
     function = 'temp_bc_func'
     variable = temp
@@ -365,7 +365,7 @@ diri_temp=1030
 [Materials]
   [./fuel]
     type = GenericMoltresMaterial
-    property_tables_root = '../input-data/data3/msfr_temp_fuel_'
+    property_tables_root = '../../input-data/data3/msfr_temp_fuel_'
     interp_type = 'spline'
     block = 'fuel'
     prop_names = 'k cp'
@@ -378,22 +378,6 @@ diri_temp=1030
     args = 'temp'
     derivative_order = 1
     block = 'fuel'
-  [../]
-  [./struc]
-    type = GenericMoltresMaterial
-    property_tables_root = '../input-data/data3/msfr_temp_struc_'
-    interp_type = 'spline'
-    prop_names = 'k cp'
-    prop_values = '.25 560' 
-    block = 'struc'
-  [../]
-  [./rho_struc]
-    type = DerivativeParsedMaterial
-    f_name = rho
-    function = '10 - .00000001 * temp'
-    args = 'temp'
-    derivative_order = 1
-    block = 'struc'
   [../]
 []
 
@@ -445,6 +429,46 @@ diri_temp=1030
     variable = group1
     outputs = 'console exodus'
   [../]
+  [./group2_current]
+    type = IntegralNewVariablePostprocessor
+    variable = group2
+    outputs = 'console exodus'
+  [../]
+  [./group2_old]
+    type = IntegralOldVariablePostprocessor
+    variable = group2
+    outputs = 'console exodus'
+  [../]
+  [./group3_current]
+    type = IntegralNewVariablePostprocessor
+    variable = group3
+    outputs = 'console exodus'
+  [../]
+  [./group3_old]
+    type = IntegralOldVariablePostprocessor
+    variable = group3
+    outputs = 'console exodus'
+  [../]
+  [./group4_current]
+    type = IntegralNewVariablePostprocessor
+    variable = group4
+    outputs = 'console exodus'
+  [../]
+  [./group4_old]
+    type = IntegralOldVariablePostprocessor
+    variable = group4
+    outputs = 'console exodus'
+  [../]
+  [./group5_current]
+    type = IntegralNewVariablePostprocessor
+    variable = group5
+    outputs = 'console exodus'
+  [../]
+  [./group5_old]
+    type = IntegralOldVariablePostprocessor
+    variable = group5
+    outputs = 'console exodus'
+  [../]
   [./multiplication]
     type = DivisionPostprocessor
     value1 = group1_current
@@ -455,12 +479,6 @@ diri_temp=1030
     type = ElementAverageValue
     variable = temp
     block = 'fuel'
-    outputs = 'exodus console'
-  [../]
-  [./temp_struc]
-    type = ElementAverageValue
-    variable = temp
-    block = 'struc'
     outputs = 'exodus console'
   [../]
   # [./average_fission_heat]

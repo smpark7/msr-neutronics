@@ -365,7 +365,7 @@ diri_temp=1030
 [Materials]
   [./fuel]
     type = GenericMoltresMaterial
-    property_tables_root = '../../input-data/data3/msfr_temp_fuel_'
+    property_tables_root = '../../input-data/fuelcore/data/msfr_fuelcore_fuel_'
     interp_type = 'spline'
     block = 'fuel'
     prop_names = 'k cp'

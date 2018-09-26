@@ -1,4 +1,4 @@
-flow_velocity=0.1 # cm/s
+flow_velocity=350 # cm/s
 nt_scale=1e13
 ini_temp=1030
 diri_temp=1030
@@ -82,7 +82,7 @@ diri_temp=1030
     nt_exp_form = false
     family = MONOMIAL
     order = CONSTANT
-    jac_test = true
+    # jac_test = true
   [../]
 []
 
@@ -374,7 +374,7 @@ diri_temp=1030
   [./rho_fuel]
     type = DerivativeParsedMaterial
     f_name = rho
-    function = '(4983.56 - .882 * temp) * .000001'
+    function = '(4983.56 - .882 * temp) * .001'
     args = 'temp'
     derivative_order = 1
     block = 'fuel'
@@ -424,8 +424,18 @@ diri_temp=1030
     variable = group1
     outputs = 'console exodus'
   [../]
+  [./group1_old]
+    type = IntegralOldVariablePostprocessor
+    variable = group1
+    outputs = 'console exodus'
+  [../]
   [./group2_current]
     type = IntegralNewVariablePostprocessor
+    variable = group2
+    outputs = 'console exodus'
+  [../]
+  [./group2_old]
+    type = IntegralOldVariablePostprocessor
     variable = group2
     outputs = 'console exodus'
   [../]
@@ -434,8 +444,18 @@ diri_temp=1030
     variable = group3
     outputs = 'console exodus'
   [../]
+  [./group3_old]
+    type = IntegralOldVariablePostprocessor
+    variable = group3
+    outputs = 'console exodus'
+  [../]
   [./group4_current]
     type = IntegralNewVariablePostprocessor
+    variable = group4
+    outputs = 'console exodus'
+  [../]
+  [./group4_old]
+    type = IntegralOldVariablePostprocessor
     variable = group4
     outputs = 'console exodus'
   [../]
@@ -444,9 +464,15 @@ diri_temp=1030
     variable = group5
     outputs = 'console exodus'
   [../]
-  [./group6_current]
-    type = IntegralNewVariablePostprocessor
-    variable = group6
+  [./group5_old]
+    type = IntegralOldVariablePostprocessor
+    variable = group5
+    outputs = 'console exodus'
+  [../]
+  [./multiplication]
+    type = DivisionPostprocessor
+    value1 = group1_current
+    value2 = group1_old
     outputs = 'console exodus'
   [../]
   [./temp_fuel]

@@ -1,4 +1,4 @@
-flow_velocity=0.1 # cm/s
+flow_velocity=350 # cm/s
 nt_scale=1e13
 ini_temp=1030
 diri_temp=1030
@@ -15,7 +15,7 @@ diri_temp=1030
 []
 
 [Mesh]
-  file = 'msfr_fuel_only.e'
+  file = 'msfr_fuel_only_2d.e'
 
   block_id = '1'
   block_name = 'fuel'
@@ -25,7 +25,7 @@ diri_temp=1030
 [../]
 
 [Problem]
-  #coord_type = RZ
+  coord_type = RZ
 []
 
 [Variables]
@@ -77,12 +77,12 @@ diri_temp=1030
     block = 'fuel'
     outlet_boundaries = 'fuel_top'
     u_def = 0
-    v_def = ${flow_velocity}
-    w_def = 0
+    v_def = 0
+    w_def = ${flow_velocity}
     nt_exp_form = false
     family = MONOMIAL
     order = CONSTANT
-    jac_test = true
+    #jac_test = true
   [../]
 []
 
@@ -304,7 +304,7 @@ diri_temp=1030
   [../]
   [./temp_advection_fuel]
     type = ConservativeTemperatureAdvection
-    velocity = '0 ${flow_velocity} 0'
+    velocity = '0 0 ${flow_velocity}'
     variable = temp
     block = 'fuel'
   [../]
@@ -347,18 +347,24 @@ diri_temp=1030
     function = 'temp_bc_func'
     variable = temp
   [../]
+  [./temp_diri_bot]
+    boundary = 'fuel_bottom'
+    type = DirichletBC
+    value = '1030'
+    variable = temp
+  [../]
   [./temp_advection_outlet]
     boundary = 'fuel_top'
     type = TemperatureOutflowBC
     variable = temp
-    velocity = '0 ${flow_velocity} 0'
+    velocity = '0 0 ${flow_velocity}'
   [../]
 []
 
 [Functions]
   [./temp_bc_func]
     type = ParsedFunction
-    value = '${ini_temp} - (${ini_temp} - ${diri_temp}) * tanh(t/1e-2)'
+    value = '${ini_temp} - (${ini_temp} - ${diri_temp}) * tanh(t/1e-2) * (.1 * z + 188)'
   [../]
 []
 
@@ -369,7 +375,7 @@ diri_temp=1030
     interp_type = 'spline'
     block = 'fuel'
     prop_names = 'k cp'
-    prop_values = '.01014 1752' 
+    prop_values = '.1014 1752' 
   [../]
   [./rho_fuel]
     type = DerivativeParsedMaterial

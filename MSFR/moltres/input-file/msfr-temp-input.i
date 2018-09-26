@@ -1,7 +1,7 @@
 flow_velocity=350 # cm/s
-nt_scale=1e13
-ini_temp=1030
-diri_temp=1030
+nt_scale=1e13     # neutron flux scaling factor to enable faster solve
+ini_temp=1030     # initial temp
+diri_temp=1030    # dirichlet BC temp
 
 [GlobalParams]
   num_groups = 6
@@ -15,7 +15,7 @@ diri_temp=1030
 []
 
 [Mesh]
-  file = 'msfr_fuel_core_3d.e'
+  file = 'msfr_fuel_core_2d.e'
 
   block_id = '1 2'
   block_name = 'fuel struc'
@@ -25,7 +25,8 @@ diri_temp=1030
 [../]
 
 [Problem]
-  #coord_type = RZ
+  coord_type = RZ
+  rz_coord_axis = Y
 []
 
 [Variables]
@@ -77,12 +78,12 @@ diri_temp=1030
     block = 'fuel'
     outlet_boundaries = 'fuel_top'
     u_def = 0
-    v_def = ${flow_velocity}
-    w_def = 0
+    v_def = 0
+    w_def = ${flow_velocity}
     nt_exp_form = false
     family = MONOMIAL
     order = CONSTANT
-    # jac_test = true
+    # jac_test = true   # jacobian test
   [../]
 []
 
@@ -304,7 +305,7 @@ diri_temp=1030
   [../]
   [./temp_advection_fuel]
     type = ConservativeTemperatureAdvection
-    velocity = '0 ${flow_velocity} 0'
+    velocity = '0 0 ${flow_velocity}'
     variable = temp
     block = 'fuel'
   [../]
@@ -351,7 +352,7 @@ diri_temp=1030
     boundary = 'fuel_top'
     type = TemperatureOutflowBC
     variable = temp
-    velocity = '0 ${flow_velocity} 0'
+    velocity = '0 0 ${flow_velocity}'
   [../]
 []
 
@@ -365,23 +366,23 @@ diri_temp=1030
 [Materials]
   [./fuel]
     type = GenericMoltresMaterial
-    property_tables_root = '../input-data/data3/msfr_temp_fuel_'
+    property_tables_root = '../input-data/base_config/data3/msfr_temp_fuel_'
     interp_type = 'spline'
     block = 'fuel'
-    prop_names = 'k cp'
-    prop_values = '.01014 1752' 
+    prop_names = 'k cp'     # conductivity, capacity
+    prop_values = '.01014 1752'   # W cm-1 K-1, J kg-1 K-1
   [../]
   [./rho_fuel]
     type = DerivativeParsedMaterial
     f_name = rho
-    function = '(4983.56 - .882 * temp) * .001'
+    function = '(4983.56 - .882 * temp) * .000001'    # kg cm-3
     args = 'temp'
     derivative_order = 1
     block = 'fuel'
   [../]
   [./struc]
     type = GenericMoltresMaterial
-    property_tables_root = '../input-data/data3/msfr_temp_struc_'
+    property_tables_root = '../input-data/base_config/data3/msfr_temp_struc_'
     interp_type = 'spline'
     prop_names = 'k cp'
     prop_values = '.25 560' 
@@ -390,7 +391,7 @@ diri_temp=1030
   [./rho_struc]
     type = DerivativeParsedMaterial
     f_name = rho
-    function = '10 - .00000001 * temp'
+    function = '(10 - .00000001 * temp) * 0.000001'
     args = 'temp'
     derivative_order = 1
     block = 'struc'

@@ -1,7 +1,7 @@
-flow_velocity=0.1 # cm/s
-nt_scale=1e13
-ini_temp=1030
-diri_temp=1030
+flow_velocity=350 # cm/s
+nt_scale=1e13     # neutron flux scaling factor to enable faster solve
+ini_temp=1030     # initial temp
+diri_temp=1030    # dirichlet BC temp
 
 [GlobalParams]
   num_groups = 6
@@ -15,17 +15,17 @@ diri_temp=1030
 []
 
 [Mesh]
-  file = 'msfr_fuel_only.e'
+  file = 'msfr_fuel_core_2d.e'
 
-  block_id = '1'
-  block_name = 'fuel'
+  block_id = '1 2'
+  block_name = 'fuel struc'
 
-  boundary_id = '12 13 11'
-  boundary_name = 'fuel_bottom fuel_top outer_wall'
+  boundary_id = '22 21 23 24 25'
+  boundary_name = 'fuel_bottom fuel_top outer_wall struc_bottom struc_top'
 [../]
 
 [Problem]
-  #coord_type = RZ
+  coord_type = RZ
 []
 
 [Variables]
@@ -82,7 +82,7 @@ diri_temp=1030
     nt_exp_form = false
     family = MONOMIAL
     order = CONSTANT
-    jac_test = true
+    # jac_test = true   # jacobian test
   [../]
 []
 
@@ -149,7 +149,7 @@ diri_temp=1030
   [../]
   [./delayed_group2]
     type = DelayedNeutronSource
-    variable = group2
+    variable = group1
     block = 'fuel'
     group_number=2
   [../]
@@ -313,36 +313,36 @@ diri_temp=1030
 [BCs]
   [./vacuum_group1]
     type = VacuumConcBC
-    boundary = 'fuel_bottom fuel_top outer_wall'
+    boundary = 'fuel_bottom fuel_top struc_bottom struc_top outer_wall'
     variable = group1
   [../]
   [./vacuum_group2]
     type = VacuumConcBC
-    boundary = 'fuel_bottom fuel_top outer_wall'
+    boundary = 'fuel_bottom fuel_top struc_bottom struc_top outer_wall'
     variable = group2
   [../]
   [./vacuum_group3]
     type = VacuumConcBC
-    boundary = 'fuel_bottom fuel_top outer_wall'
+    boundary = 'fuel_bottom fuel_top struc_bottom struc_top outer_wall'
     variable = group3
   [../]
   [./vacuum_group4]
     type = VacuumConcBC
-    boundary = 'fuel_bottom fuel_top outer_wall'
+    boundary = 'fuel_bottom fuel_top struc_bottom struc_top outer_wall'
     variable = group4
   [../]
   [./vacuum_group5]
     type = VacuumConcBC
-    boundary = 'fuel_bottom fuel_top outer_wall'
+    boundary = 'fuel_bottom fuel_top struc_bottom struc_top outer_wall'
     variable = group5
   [../]
   [./vacuum_group6]
     type = VacuumConcBC
-    boundary = 'fuel_bottom fuel_top outer_wall'
+    boundary = 'fuel_bottom fuel_top struc_bottom struc_top outer_wall'
     variable = group6
   [../]
   [./temp_diri_cg]
-    boundary =  'fuel_bottom outer_wall'
+    boundary = 'struc_bottom outer_wall'
     type = FunctionDirichletBC
     function = 'temp_bc_func'
     variable = temp
@@ -352,6 +352,15 @@ diri_temp=1030
     type = TemperatureOutflowBC
     variable = temp
     velocity = '0 ${flow_velocity} 0'
+  [../]
+  [./temp_advection_inlet]
+    boundary = 'fuel_bottom'
+    type = TemperatureInflowBC
+    variable = temp
+    uu = '0'
+    vv = '${flow_velocity}'
+    ww = '0'
+    inlet_conc = '950'
   [../]
 []
 
@@ -365,19 +374,35 @@ diri_temp=1030
 [Materials]
   [./fuel]
     type = GenericMoltresMaterial
-    property_tables_root = '../../input-data/fuelcore/data/msfr_fuelcore_fuel_'
+    property_tables_root = '../input-data/base_config/data3/msfr_temp_fuel_'
     interp_type = 'spline'
     block = 'fuel'
-    prop_names = 'k cp'
-    prop_values = '.01014 1752' 
+    prop_names = 'k cp'     # conductivity, capacity
+    prop_values = '.01014 1752'   # W cm-1 K-1, J kg-1 K-1
   [../]
   [./rho_fuel]
     type = DerivativeParsedMaterial
     f_name = rho
-    function = '(4983.56 - .882 * temp) * .000001'
+    function = '(4983.56 - .882 * temp) * .000001'    # kg cm-3
     args = 'temp'
     derivative_order = 1
     block = 'fuel'
+  [../]
+  [./struc]
+    type = GenericMoltresMaterial
+    property_tables_root = '../input-data/base_config/data3/msfr_temp_struc_'
+    interp_type = 'spline'
+    prop_names = 'k cp'
+    prop_values = '.25 560' 
+    block = 'struc'
+  [../]
+  [./rho_struc]
+    type = DerivativeParsedMaterial
+    f_name = rho
+    function = '(10 - .00000001 * temp) * 0.000001'
+    args = 'temp'
+    derivative_order = 1
+    block = 'struc'
   [../]
 []
 
@@ -424,35 +449,27 @@ diri_temp=1030
     variable = group1
     outputs = 'console exodus'
   [../]
-  [./group2_current]
-    type = IntegralNewVariablePostprocessor
-    variable = group2
+  [./group1_old]
+    type = IntegralOldVariablePostprocessor
+    variable = group1
     outputs = 'console exodus'
   [../]
-  [./group3_current]
-    type = IntegralNewVariablePostprocessor
-    variable = group3
-    outputs = 'console exodus'
-  [../]
-  [./group4_current]
-    type = IntegralNewVariablePostprocessor
-    variable = group4
-    outputs = 'console exodus'
-  [../]
-  [./group5_current]
-    type = IntegralNewVariablePostprocessor
-    variable = group5
-    outputs = 'console exodus'
-  [../]
-  [./group6_current]
-    type = IntegralNewVariablePostprocessor
-    variable = group6
+  [./multiplication]
+    type = DivisionPostprocessor
+    value1 = group1_current
+    value2 = group1_old
     outputs = 'console exodus'
   [../]
   [./temp_fuel]
     type = ElementAverageValue
     variable = temp
     block = 'fuel'
+    outputs = 'exodus console'
+  [../]
+  [./temp_struc]
+    type = ElementAverageValue
+    variable = temp
+    block = 'struc'
     outputs = 'exodus console'
   [../]
   # [./average_fission_heat]
@@ -469,7 +486,7 @@ diri_temp=1030
   print_linear_residuals = true
   [./exodus]
     type = Exodus
-    file_base = 'msfr'
+    file_base = 'msfr_2'
     execute_on = 'final'
   [../]
 []

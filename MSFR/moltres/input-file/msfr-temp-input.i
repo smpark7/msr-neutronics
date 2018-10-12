@@ -441,15 +441,29 @@ diri_temp=1030    # dirichlet BC temp
     variable = group1
     outputs = 'console exodus'
   [../]
-  [./group1_old]
-    type = IntegralOldVariablePostprocessor
-    variable = group1
+  [./group2_current]
+    type = IntegralNewVariablePostprocessor
+    variable = group2
     outputs = 'console exodus'
   [../]
-  [./multiplication]
-    type = DivisionPostprocessor
-    value1 = group1_current
-    value2 = group1_old
+  [./group3_current]
+    type = IntegralNewVariablePostprocessor
+    variable = group3
+    outputs = 'console exodus'
+  [../]
+  [./group4_current]
+    type = IntegralNewVariablePostprocessor
+    variable = group4
+    outputs = 'console exodus'
+  [../]
+  [./group5_current]
+    type = IntegralNewVariablePostprocessor
+    variable = group5
+    outputs = 'console exodus'
+  [../]
+  [./group6_current]
+    type = IntegralNewVariablePostprocessor
+    variable = group6
     outputs = 'console exodus'
   [../]
   [./temp_fuel]

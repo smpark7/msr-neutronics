@@ -4,10 +4,10 @@ ini_temp=1000     # initial temp
 diri_temp=1030    # dirichlet BC temp
 
 [GlobalParams]
-  num_groups = 6
+  num_groups = 4
   num_precursor_groups = 8
   use_exp_form = false
-  group_fluxes = 'group1 group2 group3 group4 group5 group6'
+  group_fluxes = 'group1 group2 group3 group4'
   temperature = temp
   sss2_input = true
   pre_concs = 'pre1 pre2 pre3 pre4 pre5 pre6 pre7 pre8'
@@ -49,18 +49,6 @@ diri_temp=1030    # dirichlet BC temp
     scaling = 1e4
   [../]
   [./group4]
-    order = FIRST
-    family = LAGRANGE
-    initial_condition = 1e6
-    scaling = 1e4
-  [../]
-  [./group5]
-    order = FIRST
-    family = LAGRANGE
-    initial_condition = 1e6
-    scaling = 1e4
-  [../]
-  [./group6]
     order = FIRST
     family = LAGRANGE
     initial_condition = 1e6
@@ -221,72 +209,6 @@ diri_temp=1030    # dirichlet BC temp
     group_number=4
   [../]
 
-  [./time_group5]
-    type = NtTimeDerivative
-    variable = group5
-    group_number = 5
-  [../]
-  [./diff_group5]
-    type = GroupDiffusion
-    variable = group5
-    group_number = 5
-  [../]
-  [./sigma_r_group5]
-    type = SigmaR
-    variable = group5
-    group_number = 5
-  [../]
-  [./fission_source_group5]
-    type = CoupledFissionKernel
-    variable = group5
-    group_number = 5
-    block = 'fuel'
-  [../]
-  [./delayed_group5]
-    type = DelayedNeutronSource
-    variable = group5
-    block = 'fuel'
-    group_number=5
-  [../]
-  [./inscatter_group5]
-    type = InScatter
-    variable = group5
-    group_number = 5
-  [../]
-  
-  [./diff_group6]
-    type = GroupDiffusion
-    variable = group6
-    group_number = 6
-  [../]
-  [./sigma_r_group6]
-    type = SigmaR
-    variable = group6
-    group_number = 6
-  [../]
-  [./time_group6]
-    type = NtTimeDerivative
-    variable = group6
-    group_number = 6
-  [../]
-  [./fission_source_group6]
-    type = CoupledFissionKernel
-    variable = group6
-    group_number = 6
-    block = 'fuel'
-  [../]
-  [./inscatter_group6]
-    type = InScatter
-    variable = group6
-    group_number = 6
-  [../]
-  [./delayed_group6]
-    type = DelayedNeutronSource
-    variable = group6
-    block = 'fuel'
-    group_number=6
-  [../]
-
   # Temperature
   [./temp_time_derivative]
     type = MatINSTemperatureTimeDerivative
@@ -332,16 +254,6 @@ diri_temp=1030    # dirichlet BC temp
     boundary = 'fuel_bottom fuel_top struc_bottom struc_top outer_wall'
     variable = group4
   [../]
-  [./vacuum_group5]
-    type = VacuumConcBC
-    boundary = 'fuel_bottom fuel_top struc_bottom struc_top outer_wall'
-    variable = group5
-  [../]
-  [./vacuum_group6]
-    type = VacuumConcBC
-    boundary = 'fuel_bottom fuel_top struc_bottom struc_top outer_wall'
-    variable = group6
-  [../]
   [./temp_diri_cg]
     boundary = 'outer_wall'
     type = FunctionDirichletBC
@@ -371,14 +283,14 @@ diri_temp=1030    # dirichlet BC temp
 [Functions]
   [./temp_bc_func]
     type = ParsedFunction
-    value = '1000 * (.1 * y / 188 + 1)'
+    value = '1000 * (.1 * z / 188 + 1)'
   [../]
 []
 
 [Materials]
   [./fuel]
     type = GenericMoltresMaterial
-    property_tables_root = '../input-data/base_config_sup/data/msfr_temp_fuel_'
+    property_tables_root = '../input-data/base_config_sup/data2/msfr_temp_fuel_'
     interp_type = 'spline'
     block = 'fuel'
     prop_names = 'k cp'     # conductivity, capacity
@@ -394,7 +306,7 @@ diri_temp=1030    # dirichlet BC temp
   [../]
   [./struc]
     type = GenericMoltresMaterial
-    property_tables_root = '../input-data/base_config_sup/data/msfr_temp_struc_'
+    property_tables_root = '../input-data/base_config_sup/data2/msfr_temp_struc_'
     interp_type = 'spline'
     prop_names = 'k cp'
     prop_values = '.25 1560' 
@@ -412,7 +324,7 @@ diri_temp=1030    # dirichlet BC temp
 
 [Executioner]
   type = Transient
-  end_time = .1#100000000
+  end_time = 1000000
 
   nl_rel_tol = 1e-6
   nl_abs_tol = 1e-6
@@ -466,16 +378,6 @@ diri_temp=1030    # dirichlet BC temp
   [./group4_current]
     type = IntegralNewVariablePostprocessor
     variable = group4
-    outputs = 'console exodus'
-  [../]
-  [./group5_current]
-    type = IntegralNewVariablePostprocessor
-    variable = group5
-    outputs = 'console exodus'
-  [../]
-  [./group6_current]
-    type = IntegralNewVariablePostprocessor
-    variable = group6
     outputs = 'console exodus'
   [../]
   [./temp_fuel]

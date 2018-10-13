@@ -138,7 +138,7 @@ diri_temp=1030    # dirichlet BC temp
   [../]
   [./delayed_group2]
     type = DelayedNeutronSource
-    variable = group1
+    variable = group2
     block = 'fuel'
     group_number=2
   [../]
@@ -315,7 +315,7 @@ diri_temp=1030    # dirichlet BC temp
   [./rho_struc]
     type = DerivativeParsedMaterial
     f_name = rho
-    function = '(10 - .00000001 * temp) * 0.001'
+    function = '(10 - .0000001 * temp) * 0.001'
     args = 'temp'
     derivative_order = 1
     block = 'struc'

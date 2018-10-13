@@ -150,7 +150,7 @@ diri_temp=1030    # dirichlet BC temp
   [../]
   [./delayed_group2]
     type = DelayedNeutronSource
-    variable = group1
+    variable = group2
     block = 'fuel'
     group_number=2
   [../]
@@ -371,7 +371,7 @@ diri_temp=1030    # dirichlet BC temp
 [Functions]
   [./temp_bc_func]
     type = ParsedFunction
-    value = '1000 * (.1 * y / 188 + 1)'
+    value = '1000 * (.1 * z / 188 + 1)'
   [../]
 []
 
@@ -403,7 +403,7 @@ diri_temp=1030    # dirichlet BC temp
   [./rho_struc]
     type = DerivativeParsedMaterial
     f_name = rho
-    function = '(10 - .00000001 * temp) * 0.001'
+    function = '(10 - .0001 * temp) * 0.001'
     args = 'temp'
     derivative_order = 1
     block = 'struc'
@@ -412,7 +412,7 @@ diri_temp=1030    # dirichlet BC temp
 
 [Executioner]
   type = Transient
-  end_time = .1#100000000
+  end_time = 1000000
 
   nl_rel_tol = 1e-6
   nl_abs_tol = 1e-6

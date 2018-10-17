@@ -1,4 +1,4 @@
-flow_velocity=0 # cm/s
+flow_velocity=350 # cm/s
 nt_scale=1e13     # neutron flux scaling factor
 ini_temp=1000     # initial temp
 diri_temp=1030    # dirichlet BC temp
@@ -15,7 +15,7 @@ diri_temp=1030    # dirichlet BC temp
 []
 
 [Mesh]
-  file = 'msfr_fuel_core_3d.e'
+  file = 'msfr_fuel_core_3d_coarse.e'
 
   block_id = '1 2'
   block_name = 'fuel struc'
@@ -79,7 +79,7 @@ diri_temp=1030    # dirichlet BC temp
     outlet_boundaries = 'fuel_top'
     u_def = 0
     v_def = 0
-    w_def = 0
+    w_def = ${flow_velocity}
     nt_exp_form = false
     family = MONOMIAL
     order = CONSTANT
@@ -364,14 +364,15 @@ diri_temp=1030    # dirichlet BC temp
     boundary = 'fuel_bottom struc_bottom'
     type = DirichletBC
     variable = temp
-    value = '1000'
+    value = '950'
   [../]
 []
 
 [Functions]
   [./temp_bc_func]
     type = ParsedFunction
-    value = '1000 * (.1 * z / 188 + 1)'
+    #value = '1000 * (.1 * z / 188 + 1)'
+    value = '950'
   [../]
 []
 
@@ -403,7 +404,7 @@ diri_temp=1030    # dirichlet BC temp
   [./rho_struc]
     type = DerivativeParsedMaterial
     f_name = rho
-    function = '(10 - .0001 * temp) * 0.001'
+    function = '(10 - .000001 * temp) * 0.001'
     args = 'temp'
     derivative_order = 1
     block = 'struc'
@@ -412,7 +413,7 @@ diri_temp=1030    # dirichlet BC temp
 
 [Executioner]
   type = Transient
-  end_time = 1000000
+  end_time = .1#1000000
 
   nl_rel_tol = 1e-6
   nl_abs_tol = 1e-6

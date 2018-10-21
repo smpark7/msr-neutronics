@@ -11,7 +11,7 @@ diri_temp=1030    # dirichlet BC temp
   temperature = temp
   sss2_input = true
   pre_concs = 'pre1 pre2 pre3 pre4 pre5 pre6 pre7 pre8'
-  account_delayed = true
+  account_delayed = false
 []
 
 [Mesh]
@@ -31,44 +31,44 @@ diri_temp=1030    # dirichlet BC temp
 
 [Variables]
   [./group1]
-    order = FIRST
-    family = LAGRANGE
-    initial_condition = 1e6
-    scaling = 1e4
+    # order = FIRST
+    # family = LAGRANGE
+    # initial_condition = 1e6
+    # scaling = 1e4
   [../]
   [./group2]
-    order = FIRST
-    family = LAGRANGE
-    initial_condition = 1e6
-    scaling = 1e4
+    # order = FIRST
+    # family = LAGRANGE
+    # initial_condition = 1e6
+    # scaling = 1e4
   [../]
   [./group3]
-    order = FIRST
-    family = LAGRANGE
-    initial_condition = 1e6
-    scaling = 1e4
+    # order = FIRST
+    # family = LAGRANGE
+    # initial_condition = 1e6
+    # scaling = 1e4
   [../]
   [./group4]
-    order = FIRST
-    family = LAGRANGE
-    initial_condition = 1e6
-    scaling = 1e4
+    # order = FIRST
+    # family = LAGRANGE
+    # initial_condition = 1e6
+    # scaling = 1e4
   [../]
   [./group5]
-    order = FIRST
-    family = LAGRANGE
-    initial_condition = 1e6
-    scaling = 1e4
+    # order = FIRST
+    # family = LAGRANGE
+    # initial_condition = 1e6
+    # scaling = 1e4
   [../]
   [./group6]
-    order = FIRST
-    family = LAGRANGE
-    initial_condition = 1e6
-    scaling = 1e4
+    # order = FIRST
+    # family = LAGRANGE
+    # initial_condition = 1e6
+    # scaling = 1e4
   [../]
   [./temp]
-    initial_condition = ${ini_temp}
-    scaling = 1e-4
+    # initial_condition = ${ini_temp}
+    # scaling = 1e-4
   [../]
 []
 
@@ -89,11 +89,11 @@ diri_temp=1030    # dirichlet BC temp
 
 [Kernels]
   # Neutronics
-  [./time_group1]
-    type = NtTimeDerivative
-    variable = group1
-    group_number = 1
-  [../]
+#   [./time_group1]
+#     type = NtTimeDerivative
+#     variable = group1
+#     group_number = 1
+#   [../]
   [./diff_group1]
     type = GroupDiffusion
     variable = group1
@@ -132,11 +132,11 @@ diri_temp=1030    # dirichlet BC temp
     variable = group2
     group_number = 2
   [../]
-  [./time_group2]
-    type = NtTimeDerivative
-    variable = group2
-    group_number = 2
-  [../]
+#   [./time_group2]
+#     type = NtTimeDerivative
+#     variable = group2
+#     group_number = 2
+#   [../]
   [./fission_source_group2]
     type = CoupledFissionKernel
     variable = group2
@@ -155,11 +155,11 @@ diri_temp=1030    # dirichlet BC temp
     group_number=2
   [../]
 
-  [./time_group3]
-    type = NtTimeDerivative
-    variable = group3
-    group_number = 3
-  [../]
+#   [./time_group3]
+#     type = NtTimeDerivative
+#     variable = group3
+#     group_number = 3
+#   [../]
   [./diff_group3]
     type = GroupDiffusion
     variable = group3
@@ -198,11 +198,11 @@ diri_temp=1030    # dirichlet BC temp
     variable = group4
     group_number = 4
   [../]
-  [./time_group4]
-    type = NtTimeDerivative
-    variable = group4
-    group_number = 4
-  [../]
+#   [./time_group4]
+#     type = NtTimeDerivative
+#     variable = group4
+#     group_number = 4
+#   [../]
   [./fission_source_group4]
     type = CoupledFissionKernel
     variable = group4
@@ -221,11 +221,11 @@ diri_temp=1030    # dirichlet BC temp
     group_number=4
   [../]
 
-  [./time_group5]
-    type = NtTimeDerivative
-    variable = group5
-    group_number = 5
-  [../]
+#   [./time_group5]
+#     type = NtTimeDerivative
+#     variable = group5
+#     group_number = 5
+#   [../]
   [./diff_group5]
     type = GroupDiffusion
     variable = group5
@@ -264,11 +264,11 @@ diri_temp=1030    # dirichlet BC temp
     variable = group6
     group_number = 6
   [../]
-  [./time_group6]
-    type = NtTimeDerivative
-    variable = group6
-    group_number = 6
-  [../]
+#   [./time_group6]
+#     type = NtTimeDerivative
+#     variable = group6
+#     group_number = 6
+#   [../]
   [./fission_source_group6]
     type = CoupledFissionKernel
     variable = group6
@@ -288,12 +288,12 @@ diri_temp=1030    # dirichlet BC temp
   [../]
 
   # Temperature
-  [./temp_time_derivative]
-    type = MatINSTemperatureTimeDerivative
-    variable = temp
-  [../]
+#   [./temp_time_derivative]
+#     type = MatINSTemperatureTimeDerivative
+#     variable = temp
+#   [../]
   [./temp_source_fuel]
-    type = TransientFissionHeatSource
+    type = FissionHeatSource
     variable = temp
     nt_scale=${nt_scale}
     block = 'fuel'
@@ -411,34 +411,37 @@ diri_temp=1030    # dirichlet BC temp
   [../]
 []
 
+# [Executioner]
+#   type = Transient
+#   end_time = 1000000
+
+#   nl_rel_tol = 1e-6
+#   nl_abs_tol = 1e-6
+
+#   solve_type = 'NEWTON'
+#   petsc_options = '-snes_converged_reason -ksp_converged_reason -snes_linesearch_monitor'
+#   petsc_options_iname = '-pc_type -pc_factor_shift_type'
+#   petsc_options_value = 'lu       NONZERO'
+#   line_search = 'none'
+#    # petsc_options_iname = '-snes_type'
+#   # petsc_options_value = 'test'
+
+#   nl_max_its = 30
+#   l_max_its = 100
+
+#   dtmin = 1e-5
+#   # dtmax = 1
+#   # dt = 1e-3
+#   [./TimeStepper]
+#     type = IterationAdaptiveDT
+#     dt = 1e-3
+#     cutback_factor = 0.4
+#     growth_factor = 1.2
+#     optimal_iterations = 20
+#   [../]
+# []
 [Executioner]
-  type = Transient
-  end_time = 1000000
-
-  nl_rel_tol = 1e-6
-  nl_abs_tol = 1e-6
-
-  solve_type = 'NEWTON'
-  petsc_options = '-snes_converged_reason -ksp_converged_reason -snes_linesearch_monitor'
-  petsc_options_iname = '-pc_type -pc_factor_shift_type'
-  petsc_options_value = 'lu       NONZERO'
-  line_search = 'none'
-   # petsc_options_iname = '-snes_type'
-  # petsc_options_value = 'test'
-
-  nl_max_its = 30
-  l_max_its = 100
-
-  dtmin = 1e-5
-  # dtmax = 1
-  # dt = 1e-3
-  [./TimeStepper]
-    type = IterationAdaptiveDT
-    dt = 1e-3
-    cutback_factor = 0.4
-    growth_factor = 1.2
-    optimal_iterations = 20
-  [../]
+  type = Steady
 []
 
 [Preconditioning]
@@ -449,36 +452,36 @@ diri_temp=1030    # dirichlet BC temp
 []
 
 [Postprocessors]
-  [./group1_current]
-    type = IntegralNewVariablePostprocessor
-    variable = group1
-    outputs = 'console exodus'
-  [../]
-  [./group2_current]
-    type = IntegralNewVariablePostprocessor
-    variable = group2
-    outputs = 'console exodus'
-  [../]
-  [./group3_current]
-    type = IntegralNewVariablePostprocessor
-    variable = group3
-    outputs = 'console exodus'
-  [../]
-  [./group4_current]
-    type = IntegralNewVariablePostprocessor
-    variable = group4
-    outputs = 'console exodus'
-  [../]
-  [./group5_current]
-    type = IntegralNewVariablePostprocessor
-    variable = group5
-    outputs = 'console exodus'
-  [../]
-  [./group6_current]
-    type = IntegralNewVariablePostprocessor
-    variable = group6
-    outputs = 'console exodus'
-  [../]
+  # [./group1_current]
+  #   type = IntegralNewVariablePostprocessor
+  #   variable = group1
+  #   outputs = 'console exodus'
+  # [../]
+  # [./group2_current]
+  #   type = IntegralNewVariablePostprocessor
+  #   variable = group2
+  #   outputs = 'console exodus'
+  # [../]
+  # [./group3_current]
+  #   type = IntegralNewVariablePostprocessor
+  #   variable = group3
+  #   outputs = 'console exodus'
+  # [../]
+  # [./group4_current]
+  #   type = IntegralNewVariablePostprocessor
+  #   variable = group4
+  #   outputs = 'console exodus'
+  # [../]
+  # [./group5_current]
+  #   type = IntegralNewVariablePostprocessor
+  #   variable = group5
+  #   outputs = 'console exodus'
+  # [../]
+  # [./group6_current]
+  #   type = IntegralNewVariablePostprocessor
+  #   variable = group6
+  #   outputs = 'console exodus'
+  # [../]
   [./temp_fuel]
     type = ElementAverageValue
     variable = temp
@@ -491,24 +494,29 @@ diri_temp=1030    # dirichlet BC temp
     block = 'struc'
     outputs = 'exodus console'
   [../]
-  [./group1_old]
-    type = IntegralOldVariablePostprocessor
+  [./group1_final]
+    type = ElementAverageValue
     variable = group1
-    outputs = 'console exodus'
+    outputs = 'exodus console'
   [../]
-  [./multiplication]
-    type = DivisionPostprocessor
-    value1 = group1_current
-    value2 = group1_old
-    outputs = 'console exodus'
-  [../]
-  [./average_fission_heat]
-    type = AverageFissionHeat
-    nt_scale = ${nt_scale}
-    execute_on = 'linear nonlinear'
-    outputs = 'console'
-    block = 'fuel'
-  [../]
+  # [./group1_old]
+  #   type = IntegralOldVariablePostprocessor
+  #   variable = group1
+  #   outputs = 'console exodus'
+  # [../]
+  # [./multiplication]
+  #   type = DivisionPostprocessor
+  #   value1 = group1_current
+  #   value2 = group1_old
+  #   outputs = 'console exodus'
+  # [../]
+  # [./average_fission_heat]
+  #   type = AverageFissionHeat
+  #   nt_scale = ${nt_scale}
+  #   execute_on = 'linear nonlinear'
+  #   outputs = 'console'
+  #   block = 'fuel'
+  # [../]
 []
 
 [Outputs]
@@ -517,6 +525,6 @@ diri_temp=1030    # dirichlet BC temp
   [./exodus]
     type = Exodus
     file_base = 'msfr'
-    execute_on = 'final'
+    # execute_on = 'final'
   [../]
 []

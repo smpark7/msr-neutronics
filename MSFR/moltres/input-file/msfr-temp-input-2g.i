@@ -1,4 +1,4 @@
-flow_velocity=350 # cm/s
+flow_velocity=120 # cm/s
 nt_scale=1e13     # neutron flux scaling factor
 ini_temp=1000     # initial temp
 diri_temp=1030    # dirichlet BC temp
@@ -15,13 +15,13 @@ diri_temp=1030    # dirichlet BC temp
 []
 
 [Mesh]
-  file = 'msfr_fuel_core_3d_coarse.e'
+  file = 'msfr_fuel_core_3d_reduced.e'
 
-  block_id = '1 2'
-  block_name = 'fuel struc'
+  #block_id = '1 2'
+  #block_name = 'fuel struc'
 
-  boundary_id = '22 21 23 24 25'
-  boundary_name = 'fuel_bottom fuel_top outer_wall struc_bottom struc_top'
+  #boundary_id = '22 21 23 24 25'
+  #boundary_name = 'fuel_bottom fuel_top outer_wall struc_bottom struc_top'
 [../]
 
 [Problem]
@@ -54,8 +54,8 @@ diri_temp=1030    # dirichlet BC temp
     block = 'fuel'
     outlet_boundaries = 'fuel_top'
     u_def = 0
-    v_def = ${flow_velocity}
-    w_def = 0
+    v_def = 0
+    w_def = ${flow_velocity}
     nt_exp_form = false
     family = MONOMIAL
     order = CONSTANT
@@ -167,7 +167,7 @@ diri_temp=1030    # dirichlet BC temp
     variable = group2
   [../]
   [./temp_diri_cg]
-    boundary = 'outer_wall'
+    boundary = 'outer_wall fuel_bottom struc_bottom'
     type = FunctionDirichletBC
     function = 'temp_bc_func'
     variable = temp
@@ -184,19 +184,19 @@ diri_temp=1030    # dirichlet BC temp
   #  variable = temp
   #  value = '1030'
   #[../]
-  [./temp_diri_bot]
-    boundary = 'fuel_bottom struc_bottom'
-    type = DirichletBC
-    variable = temp
-    value = '1000'
-  [../]
+  #[./temp_diri_bot]
+  #  boundary = 'fuel_bottom struc_bottom'
+  #  type = DirichletBC
+  #  variable = temp
+  #  value = '1000'
+  #[../]
 []
 
 [Functions]
   [./temp_bc_func]
     type = ParsedFunction
     #value = '1000 * (.1 * z / 188 + 1)'
-    value = '1030'
+    value = '${ini_temp} - (${ini_temp} - ${diri_temp}) * tanh(t/1e-2)'
   [../]
 []
 

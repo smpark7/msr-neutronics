@@ -1,4 +1,4 @@
-flow_velocity=350 # cm/s
+flow_velocity=120 # cm/s
 nt_scale=1e13     # neutron flux scaling factor
 ini_temp=1000     # initial temp
 diri_temp=1030    # dirichlet BC temp
@@ -411,38 +411,38 @@ diri_temp=1030    # dirichlet BC temp
   [../]
 []
 
-# [Executioner]
-#   type = Transient
-#   end_time = 1000000
-
-#   nl_rel_tol = 1e-6
-#   nl_abs_tol = 1e-6
-
-#   solve_type = 'NEWTON'
-#   petsc_options = '-snes_converged_reason -ksp_converged_reason -snes_linesearch_monitor'
-#   petsc_options_iname = '-pc_type -pc_factor_shift_type'
-#   petsc_options_value = 'lu       NONZERO'
-#   line_search = 'none'
-#    # petsc_options_iname = '-snes_type'
-#   # petsc_options_value = 'test'
-
-#   nl_max_its = 30
-#   l_max_its = 100
-
-#   dtmin = 1e-5
-#   # dtmax = 1
-#   # dt = 1e-3
-#   [./TimeStepper]
-#     type = IterationAdaptiveDT
-#     dt = 1e-3
-#     cutback_factor = 0.4
-#     growth_factor = 1.2
-#     optimal_iterations = 20
-#   [../]
-# []
 [Executioner]
-  type = Steady
+  type = Transient
+  end_time = 1000000
+
+  nl_rel_tol = 1e-6
+  nl_abs_tol = 1e-6
+
+  solve_type = 'NEWTON'
+  petsc_options = '-snes_converged_reason -ksp_converged_reason -snes_linesearch_monitor'
+  petsc_options_iname = '-pc_type -pc_factor_shift_type'
+  petsc_options_value = 'lu       NONZERO'
+  line_search = 'none'
+  # petsc_options_iname = '-snes_type'
+  # petsc_options_value = 'test'
+
+  nl_max_its = 30
+  l_max_its = 100
+
+  dtmin = 1e-5
+  # dtmax = 1
+  # dt = 1e-3
+  [./TimeStepper]
+    type = IterationAdaptiveDT
+    dt = 1e-3
+    cutback_factor = 0.4
+    growth_factor = 1.2
+    optimal_iterations = 20
+  [../]
 []
+#[Executioner]
+#  type = Steady
+#[]
 
 [Preconditioning]
   [./SMP]

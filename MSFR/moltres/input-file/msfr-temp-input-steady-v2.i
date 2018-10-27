@@ -8,7 +8,7 @@ diri_temp=1030    # dirichlet BC temp
   num_precursor_groups = 8
   temperature = temp
   group_fluxes = 'group1 group2'
-  pre_concs = 'pre1 pre2 pre3 pre4 pre5 pre6 pre7 pre8'
+  #pre_concs = 'pre1 pre2 pre3 pre4 pre5 pre6 pre7 pre8'
   power = 3000
   use_exp_form = false
   sss2_input = true
@@ -17,6 +17,9 @@ diri_temp=1030    # dirichlet BC temp
 
 [Problem]
   type = FEProblem
+
+  coord_type = RZ
+  rz_coord_axis = Y
 [../]
 
 [Mesh]
@@ -26,7 +29,8 @@ diri_temp=1030    # dirichlet BC temp
 #   ymax = 6
 #   nx = 15
 #   ny = 15
-  file = 'msfr_fuel_core_3d_reduced_x.e'
+  # file = 'msfr_fuel_core_3d_reduced_x.e'
+  file = 'msfr_fuel_core_2d.e'
 
   block_id = '1 2'
   block_name = 'fuel struc'
@@ -122,28 +126,28 @@ diri_temp=1030    # dirichlet BC temp
     variable = temp
     save_in = 'src_resid tot_resid'
   [../]
-  [./temp_advection_fuel]
-    type = ConservativeTemperatureAdvection
-    velocity = '0 0 ${flow_velocity}'
-    variable = temp
-    block = 'fuel'
-  [../]
+#   [./temp_advection_fuel]
+#     type = ConservativeTemperatureAdvection
+#     velocity = '0 0 ${flow_velocity}'
+#     variable = temp
+#     block = 'fuel'
+#   [../]
 []
 
-[Precursors]
-  [./pres]
-    var_name_base = pre
-    block = 'fuel'
-    outlet_boundaries = 'fuel_top'
-    u_def = 0
-    v_def = 0
-    w_def = ${flow_velocity}
-    nt_exp_form = false
-    family = MONOMIAL
-    order = CONSTANT
-    # jac_test = true   # jacobian test
-  [../]
-[]
+# [Precursors]
+#   [./pres]
+#     var_name_base = pre
+#     block = 'fuel'
+#     outlet_boundaries = 'fuel_top'
+#     u_def = 0
+#     v_def = 0
+#     w_def = ${flow_velocity}
+#     nt_exp_form = false
+#     family = MONOMIAL
+#     order = CONSTANT
+#     # jac_test = true   # jacobian test
+#   [../]
+# []
 
 [AuxVariables]
   [./Qf]
@@ -190,7 +194,7 @@ diri_temp=1030    # dirichlet BC temp
   [./fuel]
     type = GenericMoltresMaterial
     property_tables_root = '../input-data/fuelcore/data2/msfr_temp_fuel_'
-    #interp_type = 'spline'
+    interp_type = 'least_squares'
     block = 'fuel'
     prop_names = 'k cp rho'     # conductivity, capacity
     prop_values = '.01014 1752 4.075e-3'   # W cm-1 K-1, J kg-1 K-1
@@ -198,7 +202,7 @@ diri_temp=1030    # dirichlet BC temp
   [./struc]
     type = GenericMoltresMaterial
     property_tables_root = '../input-data/base_config_sup/data/msfr_temp_struc_'
-    #interp_type = 'spline'
+    interp_type = 'least_squares'
     prop_names = 'k cp rho'
     prop_values = '.25 1560 .01' 
     block = 'struc'
@@ -231,26 +235,23 @@ diri_temp=1030    # dirichlet BC temp
 []
 
 [Executioner]
-  # type = NonlinearEigen
-  # free_power_iterations = 4
-  # source_abs_tol = 1e-12
-  # source_rel_tol = 1e-8
-  # output_after_power_iterations = true
-
-
   type = NonlinearEigen
-  free_power_iterations = 2
+  free_power_iterations = 4
   source_abs_tol = 1e-12
   source_rel_tol = 1e-8
-  output_after_power_iterations = false
+  output_after_power_iterations = true
+
+#   type = InversePowerMethod
+#   max_power_iterations = 50
+#   xdiff = 'group1diff'
 
   bx_norm = 'bnorm'
   k0 = 1.0
   pfactor = 1e-2
   l_max_its = 100
 
-  solve_type = 'PJFNK'
-  # solve_type = 'NEWTON'
+  # solve_type = 'PJFNK'
+  solve_type = 'NEWTON'
   petsc_options = '-snes_converged_reason -ksp_converged_reason -snes_linesearch_monitor'
   # petsc_options_iname = '-pc_type -sub_pc_type'
   # petsc_options_value = 'asm lu'

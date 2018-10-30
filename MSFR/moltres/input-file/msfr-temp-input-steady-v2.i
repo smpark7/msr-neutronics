@@ -210,15 +210,27 @@ diri_temp=1030    # dirichlet BC temp
 []
 
 [BCs]
+#   [./vacuum_group1]
+#     type = VacuumConcBC
+#     boundary = 'fuel_bottom fuel_top struc_bottom struc_top outer_wall'
+#     variable = group1
+#   [../]
+#   [./vacuum_group2]
+#     type = VacuumConcBC
+#     boundary = 'fuel_bottom fuel_top struc_bottom struc_top outer_wall'
+#     variable = group2
+#   [../]
   [./vacuum_group1]
-    type = VacuumConcBC
+    type = NeumannBC
     boundary = 'fuel_bottom fuel_top struc_bottom struc_top outer_wall'
     variable = group1
+    value = '0'
   [../]
   [./vacuum_group2]
-    type = VacuumConcBC
+    type = NeumannBC
     boundary = 'fuel_bottom fuel_top struc_bottom struc_top outer_wall'
     variable = group2
+    value = '0'
   [../]
   [./temp]
     boundary = 'fuel_bottom fuel_top struc_bottom struc_top outer_wall'
@@ -250,8 +262,8 @@ diri_temp=1030    # dirichlet BC temp
   pfactor = 1e-2
   l_max_its = 100
 
-  # solve_type = 'PJFNK'
-  solve_type = 'NEWTON'
+  solve_type = 'PJFNK'
+#   solve_type = 'NEWTON'
   petsc_options = '-snes_converged_reason -ksp_converged_reason -snes_linesearch_monitor'
   # petsc_options_iname = '-pc_type -sub_pc_type'
   # petsc_options_value = 'asm lu'

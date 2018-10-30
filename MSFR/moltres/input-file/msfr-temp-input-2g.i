@@ -1,6 +1,6 @@
-flow_velocity=120 # cm/s
+flow_velocity=0 # cm/s
 nt_scale=1e13     # neutron flux scaling factor
-ini_temp=1000     # initial temp
+ini_temp=900     # initial temp
 diri_temp=1030    # dirichlet BC temp
 
 [GlobalParams]
@@ -15,7 +15,7 @@ diri_temp=1030    # dirichlet BC temp
 []
 
 [Mesh]
-  file = 'msfr_fuel_core_3d_reduced.e'
+  file = 'msfr_fuel_core_2d.e'
 
   #block_id = '1 2'
   #block_name = 'fuel struc'
@@ -25,7 +25,7 @@ diri_temp=1030    # dirichlet BC temp
 [../]
 
 [Problem]
-  #coord_type = RZ
+  coord_type = RZ
   #rz_coord_axis = Y
 []
 
@@ -54,8 +54,8 @@ diri_temp=1030    # dirichlet BC temp
     block = 'fuel'
     outlet_boundaries = 'fuel_top'
     u_def = 0
-    v_def = 0
-    w_def = ${flow_velocity}
+    v_def = ${flow_velocity}
+    w_def = 0
     nt_exp_form = false
     family = MONOMIAL
     order = CONSTANT
@@ -149,25 +149,37 @@ diri_temp=1030    # dirichlet BC temp
   [../]
   [./temp_advection_fuel]
     type = ConservativeTemperatureAdvection
-    velocity = '0 0 ${flow_velocity}'
+    velocity = '0 ${flow_velocity} 0'
     variable = temp
     block = 'fuel'
   [../]
 []
 
 [BCs]
+  # [./vacuum_group1]
+  #   type = VacuumConcBC
+  #   boundary = 'fuel_bottom fuel_top struc_bottom struc_top outer_wall'
+  #   variable = group1
+  # [../]
+  # [./vacuum_group2]
+  #   type = VacuumConcBC
+  #   boundary = 'fuel_bottom fuel_top struc_bottom struc_top outer_wall'
+  #   variable = group2
+  # [../]
   [./vacuum_group1]
-    type = VacuumConcBC
+    type = NeumannBC
     boundary = 'fuel_bottom fuel_top struc_bottom struc_top outer_wall'
     variable = group1
+    value = '0'
   [../]
   [./vacuum_group2]
-    type = VacuumConcBC
+    type = NeumannBC
     boundary = 'fuel_bottom fuel_top struc_bottom struc_top outer_wall'
     variable = group2
+    value = '0'
   [../]
   [./temp_diri_cg]
-    boundary = 'outer_wall fuel_bottom struc_bottom'
+    boundary = 'outer_wall'
     type = FunctionDirichletBC
     function = 'temp_bc_func'
     variable = temp
@@ -176,7 +188,7 @@ diri_temp=1030    # dirichlet BC temp
     boundary = 'fuel_top'
     type = TemperatureOutflowBC
     variable = temp
-    velocity = '0 0 ${flow_velocity}'
+    velocity = '0 ${flow_velocity} 0'
   [../]
   #[./temp_diri_top]
   #  boundary = 'fuel_top'
@@ -184,19 +196,19 @@ diri_temp=1030    # dirichlet BC temp
   #  variable = temp
   #  value = '1030'
   #[../]
-  #[./temp_diri_bot]
-  #  boundary = 'fuel_bottom struc_bottom'
-  #  type = DirichletBC
-  #  variable = temp
-  #  value = '1000'
-  #[../]
+  [./temp_diri_bot]
+   boundary = 'fuel_bottom struc_bottom'
+   type = DirichletBC
+   variable = temp
+   value = '900'
+  [../]
 []
 
 [Functions]
   [./temp_bc_func]
     type = ParsedFunction
     #value = '1000 * (.1 * z / 188 + 1)'
-    value = '${ini_temp} - (${ini_temp} - ${diri_temp}) * tanh(t/1e-2)'
+    value = '${ini_temp} - (${ini_temp} - ${diri_temp}) * tanh(t/1000)'
   [../]
 []
 

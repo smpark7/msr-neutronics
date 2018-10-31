@@ -215,7 +215,7 @@ diri_temp=1030    # dirichlet BC temp
 [Materials]
   [./fuel]
     type = GenericMoltresMaterial
-    property_tables_root = '../input-data/fuelcore/data2/msfr_temp_fuel_'
+    property_tables_root = '../input-data/fuelcore/data3/msfr_temp_fuel_'
     interp_type = 'spline'
     block = 'fuel'
     prop_names = 'k cp'     # conductivity, capacity
@@ -231,7 +231,7 @@ diri_temp=1030    # dirichlet BC temp
   [../]
   [./struc]
     type = GenericMoltresMaterial
-    property_tables_root = '../input-data/fuelcore/data2/msfr_temp_struc_'
+    property_tables_root = '../input-data/fuelcore/data3/msfr_temp_struc_'
     interp_type = 'spline'
     prop_names = 'k cp'
     prop_values = '.25 1560' 

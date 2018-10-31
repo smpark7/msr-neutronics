@@ -1,4 +1,4 @@
-flow_velocity=21.7 # cm/s. See MSRE-properties.ods
+flow_velocity=1 # cm/s. See MSRE-properties.ods
 nt_scale=1e13
 ini_temp=922
 diri_temp=922
@@ -15,12 +15,12 @@ diri_temp=922
 []
 
 [Mesh]
-  file = 'msfr_fuel_core_3d_coarse.e'
-  # file = '2d_lattice_structured_jac.msh'
+  # file = '2d_lattice_structured.msh'
+  file = 'msfr_fuel_core_2d.e'
 [../]
 
 [Problem]
-  #coord_type = RZ
+  coord_type = RZ
 []
 
 [Variables]
@@ -48,8 +48,8 @@ diri_temp=922
     block = 'fuel'
     outlet_boundaries = 'fuel_top'
     u_def = 0
-    v_def = 0
-    w_def = ${flow_velocity}
+    v_def = ${flow_velocity}
+    w_def = 0
     nt_exp_form = false
     family = MONOMIAL
     order = CONSTANT
@@ -143,22 +143,34 @@ diri_temp=922
   [../]
   [./temp_advection_fuel]
     type = ConservativeTemperatureAdvection
-    velocity = '0 0 ${flow_velocity}'
+    velocity = '0 ${flow_velocity} 0'
     variable = temp
     block = 'fuel'
   [../]
 []
 
 [BCs]
-  [./vacuum_group1]
-    type = VacuumConcBC
+  # [./vacuum_group1]
+  #   type = VacuumConcBC
+  #   boundary = 'fuel_bottom fuel_top struc_bottom struc_top outer_wall'
+  #   variable = group1
+  # [../]
+  # [./vacuum_group2]
+  #   type = VacuumConcBC
+  #   boundary = 'fuel_bottom fuel_top struc_bottom struc_top outer_wall'
+  #   variable = group2
+  # [../]
+  [./reflect_group1]
+    type = NeumannBC
     boundary = 'fuel_bottom fuel_top struc_bottom struc_top outer_wall'
     variable = group1
+    value = '0'
   [../]
-  [./vacuum_group2]
-    type = VacuumConcBC
+  [./reflect_group2]
+    type = NeumannBC
     boundary = 'fuel_bottom fuel_top struc_bottom struc_top outer_wall'
     variable = group2
+    value = '0'
   [../]
   [./temp_diri_cg]
     boundary = 'struc_bottom fuel_bottom outer_wall'
@@ -170,7 +182,7 @@ diri_temp=922
     boundary = 'fuel_top'
     type = TemperatureOutflowBC
     variable = temp
-    velocity = '0 0 ${flow_velocity}'
+    velocity = '0 ${flow_velocity} 0'
   [../]
 []
 
@@ -184,7 +196,7 @@ diri_temp=922
 [Materials]
   [./fuel]
     type = GenericMoltresMaterial
-    property_tables_root = '../moltres/input-data/fuelcore/data2/msfr_temp_fuel_'
+    property_tables_root = '../moltres/input-data/fuelcore/data3/msfr_temp_fuel_'
     interp_type = 'spline'
     block = 'fuel'
     prop_names = 'k cp'
@@ -193,14 +205,14 @@ diri_temp=922
   [./rho_fuel]
     type = DerivativeParsedMaterial
     f_name = rho
-    function = '2.146e-3 * exp(-1.8 * 1.18e-4 * (temp - 922))'
+    function = '(4983.56 - .882 * temp) * .000001'
     args = 'temp'
     derivative_order = 1
     block = 'fuel'
   [../]
   [./struc]
     type = GenericMoltresMaterial
-    property_tables_root = '../moltres/input-data/fuelcore/data2/msfr_temp_struc_'
+    property_tables_root = '../moltres/input-data/fuelcore/data3/msfr_temp_struc_'
     interp_type = 'spline'
     prop_names = 'k cp'
     prop_values = '.25 1560' # Cammi 2011 at 908 K

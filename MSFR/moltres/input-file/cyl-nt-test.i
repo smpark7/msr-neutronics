@@ -16,12 +16,6 @@ diri_temp=1030    # dirichlet BC temp
 
 [Mesh]
   file = 'cyl_nt_test_mesh.e'
-
-  #block_id = '1 2'
-  #block_name = 'fuel struc'
-
-  #boundary_id = '22 21 23 24 25'
-  #boundary_name = 'fuel_bottom fuel_top outer_wall struc_bottom struc_top'
 [../]
 
 [Problem]
@@ -207,8 +201,6 @@ diri_temp=1030    # dirichlet BC temp
 [Functions]
   [./temp_bc_func]
     type = ParsedFunction
-    #value = '1000 * (.1 * z / 188 + 1)'
-    #value = '${ini_temp} - (${ini_temp} - ${diri_temp}) * tanh(t/1000)'
     value = '930'
   [../]
 []
@@ -234,7 +226,7 @@ diri_temp=1030    # dirichlet BC temp
 
 [Executioner]
   type = Transient
-  end_time = .001#1000000
+  end_time = .001 #1000000
 
   nl_rel_tol = 1e-6
   nl_abs_tol = 1e-6
@@ -286,12 +278,6 @@ diri_temp=1030    # dirichlet BC temp
     block = 'fuel'
     outputs = 'exodus console'
   [../]
-  # [./temp_struc]
-  #   type = ElementAverageValue
-  #   variable = temp
-  #   block = 'struc'
-  #   outputs = 'exodus console'
-  # [../]
   [./group1_old]
     type = IntegralOldVariablePostprocessor
     variable = group1
@@ -317,7 +303,7 @@ diri_temp=1030    # dirichlet BC temp
   print_linear_residuals = true
   [./exodus]
     type = Exodus
-    file_base = 'msfr'
+    file_base = 'cyl'
     execute_on = 'final'
   [../]
 []

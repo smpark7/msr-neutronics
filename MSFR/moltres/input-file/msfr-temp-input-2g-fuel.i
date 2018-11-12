@@ -1,6 +1,6 @@
-flow_velocity=0 # cm/s
+flow_velocity=21.7 # cm/s
 nt_scale=1e13     # neutron flux scaling factor
-ini_temp=900     # initial temp
+ini_temp=930     # initial temp
 diri_temp=1030    # dirichlet BC temp
 
 [GlobalParams]
@@ -15,7 +15,7 @@ diri_temp=1030    # dirichlet BC temp
 []
 
 [Mesh]
-  file = 'msfr_fuel_core_2d.e'
+  file = 'msfr_fuel_only_2d.e'
 
   #block_id = '1 2'
   #block_name = 'fuel struc'
@@ -39,7 +39,7 @@ diri_temp=1030    # dirichlet BC temp
   [./group2]
     order = FIRST
     family = LAGRANGE
-    initial_condition = 1e6
+    initial_condition = 0
     scaling = 1e4
   [../]
   [./temp]
@@ -158,23 +158,23 @@ diri_temp=1030    # dirichlet BC temp
 [BCs]
   # [./vacuum_group1]
   #   type = VacuumConcBC
-  #   boundary = 'fuel_bottom fuel_top struc_bottom struc_top outer_wall'
+  #   boundary = 'fuel_bottom fuel_top outer_wall'
   #   variable = group1
   # [../]
   # [./vacuum_group2]
   #   type = VacuumConcBC
-  #   boundary = 'fuel_bottom fuel_top struc_bottom struc_top outer_wall'
+  #   boundary = 'fuel_bottom fuel_top outer_wall'
   #   variable = group2
   # [../]
   [./vacuum_group1]
     type = NeumannBC
-    boundary = 'fuel_bottom fuel_top struc_bottom struc_top outer_wall'
+    boundary = 'fuel_bottom fuel_top outer_wall'
     variable = group1
     value = '0'
   [../]
   [./vacuum_group2]
     type = NeumannBC
-    boundary = 'fuel_bottom fuel_top struc_bottom struc_top outer_wall'
+    boundary = 'fuel_bottom fuel_top outer_wall'
     variable = group2
     value = '0'
   [../]
@@ -197,10 +197,10 @@ diri_temp=1030    # dirichlet BC temp
   #  value = '1030'
   #[../]
   [./temp_diri_bot]
-   boundary = 'fuel_bottom struc_bottom'
+   boundary = 'fuel_bottom'
    type = DirichletBC
    variable = temp
-   value = '900'
+   value = '930'
   [../]
 []
 
@@ -208,7 +208,8 @@ diri_temp=1030    # dirichlet BC temp
   [./temp_bc_func]
     type = ParsedFunction
     #value = '1000 * (.1 * z / 188 + 1)'
-    value = '${ini_temp} - (${ini_temp} - ${diri_temp}) * tanh(t/1000)'
+    #value = '${ini_temp} - (${ini_temp} - ${diri_temp}) * tanh(t/1000)'
+    value = '930'
   [../]
 []
 
@@ -229,27 +230,27 @@ diri_temp=1030    # dirichlet BC temp
     derivative_order = 1
     block = 'fuel'
   [../]
-  [./struc]
-    type = GenericMoltresMaterial
-    property_tables_root = '../input-data/fuelcore/data3/msfr_temp_struc_'
-    interp_type = 'spline'
-    prop_names = 'k cp'
-    prop_values = '.25 1560' 
-    block = 'struc'
-  [../]
-  [./rho_struc]
-    type = DerivativeParsedMaterial
-    f_name = rho
-    function = '(10 - .0000001 * temp) * 0.001'
-    args = 'temp'
-    derivative_order = 1
-    block = 'struc'
-  [../]
+  # [./struc]
+  #   type = GenericMoltresMaterial
+  #   property_tables_root = '../input-data/fuelcore/data3/msfr_temp_struc_'
+  #   interp_type = 'spline'
+  #   prop_names = 'k cp'
+  #   prop_values = '.25 1560' 
+  #   block = 'struc'
+  # [../]
+  # [./rho_struc]
+  #   type = DerivativeParsedMaterial
+  #   f_name = rho
+  #   function = '(10 - .0000001 * temp) * 0.001'
+  #   args = 'temp'
+  #   derivative_order = 1
+  #   block = 'struc'
+  # [../]
 []
 
 [Executioner]
   type = Transient
-  end_time = 1000000
+  end_time = 500#100000
 
   nl_rel_tol = 1e-6
   nl_abs_tol = 1e-6
@@ -301,12 +302,12 @@ diri_temp=1030    # dirichlet BC temp
     block = 'fuel'
     outputs = 'exodus console'
   [../]
-  [./temp_struc]
-    type = ElementAverageValue
-    variable = temp
-    block = 'struc'
-    outputs = 'exodus console'
-  [../]
+  # [./temp_struc]
+  #   type = ElementAverageValue
+  #   variable = temp
+  #   block = 'struc'
+  #   outputs = 'exodus console'
+  # [../]
   [./group1_old]
     type = IntegralOldVariablePostprocessor
     variable = group1

@@ -51,7 +51,7 @@ diri_temp=1030    # dirichlet BC temp
   [./temp]
     order = FIRST
     family = LAGRANGE
-    scaling = 1e-6
+    # scaling = 1e-6
   [../]
 []
 
@@ -193,7 +193,7 @@ diri_temp=1030    # dirichlet BC temp
 [Materials]
   [./fuel]
     type = GenericMoltresMaterial
-    property_tables_root = '../input-data/fuelcore/data2/msfr_temp_fuel_'
+    property_tables_root = '../input-data/fuelcore/data3/msfr_temp_fuel_'
     interp_type = 'least_squares'
     block = 'fuel'
     prop_names = 'k cp rho'     # conductivity, capacity
@@ -201,7 +201,7 @@ diri_temp=1030    # dirichlet BC temp
     [../]
   [./struc]
     type = GenericMoltresMaterial
-    property_tables_root = '../input-data/base_config_sup/data/msfr_temp_struc_'
+    property_tables_root = '../input-data/fuelcore/data3/msfr_temp_struc_'
     interp_type = 'least_squares'
     prop_names = 'k cp rho'
     prop_values = '.25 1560 .01' 
@@ -258,7 +258,7 @@ diri_temp=1030    # dirichlet BC temp
 #   xdiff = 'group1diff'
 
   bx_norm = 'bnorm'
-  k0 = 1.0
+  k0 = 1.1
   pfactor = 1e-2
   l_max_its = 100
 

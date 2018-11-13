@@ -1,0 +1,484 @@
+ *******************************************************************************
+ *                                                                             *
+ *                                 SCALE 6.2.2                                 *
+ *                                -------------                                *
+ *                                November 2018                                *
+ *                                                                             *
+ *           SCALE:  A Comprehensive Modeling and Simulation Suite             *
+ *                   for Nuclear Safety Analysis and Design                    *
+ *                                                                             *
+ *                      Reactor and Nuclear Systems Division                   *
+ *                        Oak Ridge National Laboratory                        *
+ *                                                                             *
+ *                           http://scale.ornl.gov                             *
+ *                            scalehelp@ornl.gov                               *
+ *                                                                             *
+ *******************************************************************************
+ *******************************************************************************
+      
+                  Job Information
+                  ---------------
+      Job started on smpark-Precision-Tower-3420 on Tue 13/11/2018 14:40:38
+      Working directory: /tmp/scale.smpark.335
+      Input file name  : /home/smpark/projects/msr-neutronics/MSFR/scale/msfr-input.i
+      Output file name : /home/smpark/projects/msr-neutronics/MSFR/scale/msfr-input.out
+      SCALE executable : /home/smpark/projects/SCALE-6.2.2/bin/scale
+      
+ *******************************************************************************
+
+
+    module t-xsec will be called on Tue Nov 13 14:40:39 2018.
+    sequence specification record:=t-xsec
+Input Data:
+
+      
+      2-D MSFR fuel with Ni-alloy structure
+      
+      fine_n
+      
+      read comp
+      'fuel
+      u-233  1 0 8.0683E-4 1030 end
+      th-232 1 0 5.3627E-3 1030 end
+      f-19   1 0 4.5928E-2 1030 end
+      li-7   1 0 2.1250E-2 1030 end
+      
+      'struc
+      ni 2 0 6.9461E-2 1030 end
+      w  2 0 8.1892E-3 1030 end
+      cr 2 0 8.1071E-3 1030 end
+      al 2 0 6.6957E-4 1030 end
+      end comp
+      
+end
+
+------------------------------------------------------------------------------------
+ Mixture table for component comps at line:7, column:1
+------------------------------------------------------------------------------------
+Mixture = 1 with density(g/cc) = 4.0750 and temperature(K) = 1030.00
+        Entry      Mixture      Nuclide     Density (atoms/b-cm)     Temperature (K)
+------------------------------------------------------------------------------------
+            1            1         3007             2.125000e-02             1030.00
+            2            1         9019             4.592800e-02             1030.00
+            3            1        90232             5.362700e-03             1030.00
+            4            1        92233             8.068300e-04             1030.00
+------------------------------------------------------------------------------------
+Mixture = 2 with density(g/cc) = 9.9998 and temperature(K) = 1030.00
+        Entry      Mixture      Nuclide     Density (atoms/b-cm)     Temperature (K)
+------------------------------------------------------------------------------------
+            5            2        13027             6.695700e-04             1030.00
+            6            2        24050             3.522535e-04             1030.00
+            7            2        24052             6.792858e-03             1030.00
+            8            2        24053             7.702556e-04             1030.00
+            9            2        24054             1.917329e-04             1030.00
+           10            2        28058             4.728690e-02             1030.00
+           11            2        28060             1.821483e-02             1030.00
+           12            2        28061             7.917861e-04             1030.00
+           13            2        28062             2.524561e-03             1030.00
+           14            2        28064             6.429312e-04             1030.00
+           15            2        74180             9.827040e-06             1030.00
+           16            2        74182             2.170138e-03             1030.00
+           17            2        74183             1.171875e-03             1030.00
+           18            2        74184             2.509171e-03             1030.00
+           19            2        74186             2.328190e-03             1030.00
+------------------------------------------------------------------------------------
+        Entry      Mixture      Nuclide     Density (atoms/b-cm)     Temperature (K)
+------------------------------------------------------------------------------------
+ End of mixture table for component comps at line:7, column:1
+------------------------------------------------------------------------------------
+
+XSProc built mixture pool in: 0.03 seconds.
+
+XSProc built celldata pool in: 0.00 seconds.
+
+
+
+
+************************************************************************************************************************************
+************************************************************************************************************************************
+************************************************************************************************************************************
+*****                                                                                                                          *****
+*****                                             program verification information                                             *****
+*****                                                                                                                          *****
+*****                                           code system: SCALE   version: 6.2.0                                            *****
+*****                                                                                                                          *****
+************************************************************************************************************************************
+************************************************************************************************************************************
+*****                                                                                                                          *****
+*****                                                                                                                          *****
+*****                      program:  t-xsec                                                                                    *****
+*****                                                                                                                          *****
+*****                      version:  6.2.2 (602002)                                                                            *****
+*****                                                                                                                          *****
+*****                     username:  smpark                                                                                    *****
+*****                                                                                                                          *****
+*****                     hostname:  smpark-Precision-Tower-3420                                                               *****
+*****                                                                                                                          *****
+*****                                                                                                                          *****
+*****            date of execution:  2018-11-13                                                                                *****
+*****                                                                                                                          *****
+*****            time of execution:  14:40:39                                                                                  *****
+*****                                                                                                                          *****
+************************************************************************************************************************************
+************************************************************************************************************************************
+************************************************************************************************************************************
+
+
+
+Loaded MG Library: /home/smpark/projects/SCALE-6.2.2/data/scale.rev04.xn252v7.1
+XSProc loaded ampx library in: 1.77 seconds.
+
+Loaded MultiGroup Library: /home/smpark/projects/SCALE-6.2.2/data/scale.rev04.xn252v7.1
+XSProc prepared 2 unit cells in 0.01 seconds.
+
+
+     0$ array      4 entries read
+
+     1$ array     10 entries read
+
+     1* array     10 entries read
+
+     1t
+ 
+  MG Library Source: endf Revision: 7 Mod: 1
+  Determined CE Library XML file to be: ce_v7.1_endf.xml
+
+
+   CE-KENO xsdir XML file:   /home/smpark/projects/SCALE-6.2.2/data/ce_v7.1_endf.xml
+
+
+   A new centrm library has been written on unit number:   81
+   The number of input nuclides was:                        4
+   Number of Nuclides on output PW library:                 4
+
+
+                  Description of Output CENTRM Library 
+
+ Entry    ZA   Data Src  Vers No.  Mod No.  MT-Optn  Thermal ID    XS temperatures 
+ -----  -----  --------  --------  -------  -------  ----------    --------------- 
+    1     3007    endf       7         1        1             0       1030.00
+    2     9019    endf       7         1        1             0       1030.00
+    3    90232    endf       7         1        1             0       1030.00
+    4    92233    endf       7         1        1             0       1030.00
+XSProc starting module Dancoff.
+
+ Dancoff Module Problem Description
+ ige--geometry type(0/1/2/3--inf med/slab/cyl/sphere)                         0
+ izm--number of zones or material regions                                     1
+ igo--celltype                                                                1
+ ibr--right boundary condition (0/1/2/3--vacuum/reflected/periodic/white)     0
+ ibl--left  boundary condition (0/1/2/3--vacuum/reflected/periodic/white)     0
+XSProc execution of module Dancoff completed.
+XSProc starting module Bonami.
+XSProc execution of module Bonami completed.
+XSProc starting module MixMacros.
+XSProc execution of module MixMacros completed.
+XSProc starting module CentrmPmc.
+
+ >>>> BEGIN CENTRM CALCULATION >>>>
+
+
+                         ***** Program CENTRM: Continuous ENergy TRansport Module
+
+     CENTRM MATERIALS
+
+        nuclides on                                                   Mixing Table
+        multi-grp lib.  composition                mixture   component   atom density      small
+     1      3007            1                         1         3007     2.12500E-02         1                
+     2      9019            1                         1         9019     4.59280E-02         1                
+     3     90232            1                         1        90232     5.36270E-03         1                
+     4     92233            1                         1        92233     8.06830E-04         1                
+ *** WARNING! Use of bound thermal scattering kernels is requested, but no kernel file is provided.
+               Free-gas thermal kernels will be used for all materials
+     ft81f001            =   pointwise XS library from Crawdad
+
+      MULTIGROUP STRUCTURE
+
+     igm      =      252      number of energy groups
+     mmt      =      252      number of neutron groups
+     mcr      =        0      number of gamma groups
+     iftg     =      156      first thermal group number
+
+
+     GENERAL PROBLEM DATA
+
+     ige      =        0     problem geometry
+                               0/1/2/3 = inf. hom. medium/plane/cylinder/sphere
+     izm      =        1     number of zones
+     im       =        1     number of spatial intervals
+     ibl      =        1     left boundary condition:
+                               0/1/2/3 = vacuum/reflected/periodic/albedo
+     ibr      =        1     right boundary condition:
+                               0/1/2/3 = vacuum/reflected/periodic/albedo
+     mxx      =        1     number of mixtures
+     ms       =        4     mixing table length
+     isn      =        2     SN quadrature order (not used for npxs=6)
+     isct     =        0     order of elastic scattering
+     isrc     =        1     type of source spectrum:
+                               0/1/2 = multigroup input spectrum/fission spectrum/both (1)
+     iim      =       10     inner iterations maximum (10)
+     iup      =        3     upscatter outer iterations in thermal range (3)
+     nfst     =        3     multigroup calculation option in upper energy range [option nfst=5 is deprecated]:
+                               0/1/2/3/4/6 = sn/diffusion/homogeneous/zonewise homogeneous/BN/2D MoC cell (0)
+     nthr     =        3     multigroup calculation option in lower energy range [option nthr=5 is deprecated]:
+                               0/1/2/3/4/6 = sn/diffusion/homogeneous/zonewise homogeneous/BN/2D MoC cell (0)
+     npxs     =        4     pointwise calculation option:
+                               <=0/1/2/3/4/5/6 = no pointwise: do multigroup as in nfst/sn/coll. prob./
+                                 homogeneous/zonewise homogeneous/zonewise two-region/2D MoC cell (1)
+     isvar    =        3     multigroup source & cross section linearization option :
+                               0/1/2/3 = none/linearize source/linearize group cross sections/both (3)
+     mocMesh  =        0     meshing options for MoC calculation; npxs=6 only:
+                               0/1/2   = coarse/regular/fine mesh/input by zone (0)
+     mocPol   =        0     number of polar angles for MoC quadrature; npxs=6 only:
+                               2/3/4 = allowable values        (3)
+     mocAzi   =        0     number of azimuthal angles for MoC quadrature; npxs=6 only:
+                               1 -> 16 = allowable values      (8)
+     kern     =        0     thermal neutron scattering treatment:
+                               0/1 = all free-gas thermal kernels/use bound S(alpha, beta) data if available (0)
+     iscti    =        0     inelastic scattering order (0)
+     nmf6     =       -1     inelastic scattering option:
+                               -1/0/1 = no inelastic/discrete level only/discrete+continuum (0)
+
+
+     EDITTING AND OTHER OPTIONS
+
+     iprt     =       -3     -3/-2/-1/n = mixture cross sections print options: 
+                               none/write P.W. energy & macro x-sections to output file/print 1-D M.G. x-sections
+                               /print nth p (p0,p1..) M.G. x-section matrix (-3)
+     id1      =       -1     -1/0/1/2 = flux print options:
+                                none/print M.G flux/also print M.G moments/save PW zone flux in ascii file
+     ipbt     =        0     0/1 = none/group summary table print (0)
+     iqm      =        0     input multigrp volumetric sources (0/n=no/yes)
+     ipm      =        0     input multigrp boundary angular sources (0/n=no/yes)
+     ipn      =        2     0/1/2 diff. coef. param (2)
+     idfm     =        1     0/1 = none/density factors (0)
+     ixprt    =        0     0/1 = minimum print/regular print (0)
+     mlim     =        0     0/m = no effect/restrict nuclides with mass >= m to have PW scatter order <= nlim  (100)
+     nlim     =        0     restrictive scatter order (1)
+
+
+
+     FLOATING POINT VALUES
+
+     eps      =     0.10000E-02    upscatter integral convergence (0.001)
+     ptc      =     0.10000E-03    inner iteration convergence (0.001)
+     xnf      =     0.10000E+01    source normalization factor (1.0)
+     b2       =     0.00000E+00    buckling value ( cm**(-2) )
+     demin    =     0.10000E-02    lowest energy of pointwise calculation in (eV)
+     demax    =     0.20000E+05    highest energy of pointwise calculation in (eV)
+     tole     =     0.10000E-02    tolerance used in thinning the pointwise cross sections (0.001)
+     mocRay   =     0.00000E+00    distance between MoC rays; npxs=6 only. (0.02)
+     flet     =     0.10000E+00    fractional lethargy used in construction of flux energy mesh (0.1)
+     alump    =     0.20000E+00    mass-lumping criterion (0)
+
+
+ .........................................................................................................
+
+  Input DEMIN and DEMAX values may be modified to lie on multigroup boundaries.
+    Min and Max energies (eV) defining range for pointwise flux calculation  =     1.000E-03    2.000E+04
+ .........................................................................................................
+
+
+                              *******  Nuclide Lumping Summary **********
+
+                                Lumping tolerance on mass    =   0.2000
+                                Original number of Materials =    4
+                                Number of lumped materials   =    3
+
+                              ********************************************
+
+
+
+
+          kern is input as 0 or no file supplied for bound thermal kernel data.
+          => All PW thermal scatter kernels are treated as Free Gas
+
+
+
+  ***Thermal Outer Iteration Limit Reached!
+
+  ***Worst Inner Convergence For Epithermal Groups Was 0.00000E+00
+  ***Worst Inner Convergence For Thermal Flux Was      0.00000E+00
+  ***Outer Convergence of Thermal Flux (MG/PW) Was     8.09643E-02 7.67561E-02
+  ***Max. Scale Factor For Thermal Band Was            1.01028E+00
+  ***Outer Integral Convergence of Thermal Balance Was-2.81633E-06
+
+
+
+   elapsed time .01 min.
+   =time at end of centrm_Execute.
+  
+ <<<< CENTRM CALCULATION COMPLETED <<<<
+
+ >>>> BEGIN PMC CALCULATION >>>>
+
+
+                         ***** Program PMC: Process Multigroup Cross sections
+
+     PMC LOGICAL UNITS 
+
+     libx  = 81    Input Pointwise XS Library
+     libsc = 18    Scratch Unit 1
+     libsx = 19    Scratch Unit 2
+     libsm = 17    scratch unit (master library)
+
+
+
+     PMC INPUT PARAMETERS
+
+     mrange =  2   Option for choosing energy range     0   Averaging over pointwise xs limits
+                                                        1   Averaging over resolved resonance range
+                                                        2   Averaging over pointwise flux limits
+
+     n2d    = -1   Option for 2-D scat. calculation    -2   Apply elastic removal correction to P0 matrix and 
+                                                             apply consistent PN correction to Legendre moments
+                                                       -1   Apply elastic removal correction to P0 matrix
+                                                        0   Normalize 2-D elastic data to shielded 1-D value
+                                                        1   Recompute 2-D elastic using flux and s-wave kernel
+                                                        2   Apply consistent PN correction to Legendre moments
+
+     nprt   = -1   Option for PMC print output         -1   Minimum data printed 
+                                                        0   Standard printed output
+                                                        1   Print 1-D XSs
+                                                        2   Print both 1-D and 2-D XSs 
+
+     nwt    =  0   Option for XS averaging              0   Zone average
+                                                        1   Cell average
+
+     mtt    =  1   Option for total XS calculation      0   Average independently
+                                                        1   As sum of partial XS 
+
+    pmc_omit=  0   Option for Processing PW Materials   0   Process all Pointwise Materials Used in CENTRM
+                                                        1   Process only nuclides in fissionable (fuel) regions
+                                                        N   Process all materials except N nuclides in 2$$
+
+     ixtr(2)=  0   Option for calculation sequence      0   CSAS Standard Sequence
+                                                        1   Independant (stand-alone) Execution
+                                                        2   CSAS Doubly-Heterogeneous Cell Sequence
+
+     ixtr(3)=  5   Legendre expansion order            -1   Process all Legendre expansion moments found on AMPX LIB.
+                                                  =0,...N   Process new values only up through PN moments 
+
+     n1d    =  0   Option for 1-D cross-sections        0   Weight using using scalar flux
+                                                        1   Weight using using abs value of current (1st moment)
+
+
+     XS_dilute =  1.0E+10   min background XS considered infinitely dilute
+
+   elapsed time .00 min.
+
+   elapsed time .00 min.
+
+ <<<< PMC CALCULATION COMPLETED <<<<
+
+XSProc execution of module CentrmPmc completed.
+XSProc starting module MixMacros.
+XSProc execution of module MixMacros completed.
+XSProc starting module Dancoff.
+
+ Dancoff Module Problem Description
+ ige--geometry type(0/1/2/3--inf med/slab/cyl/sphere)                         0
+ izm--number of zones or material regions                                     1
+ igo--celltype                                                                1
+ ibr--right boundary condition (0/1/2/3--vacuum/reflected/periodic/white)     0
+ ibl--left  boundary condition (0/1/2/3--vacuum/reflected/periodic/white)     0
+XSProc execution of module Dancoff completed.
+XSProc starting module Bonami.
+XSProc execution of module Bonami completed.
+XSProc starting module MixMacros.
+XSProc execution of module MixMacros completed.
+module xsproc is finished. completion code 0.
+
+
+    module newt will be called on Tue Nov 13 14:40:43 2018.
+    sequence specification record:=newt
+Input Data:
+
+      
+      2-D MSFR core region
+      
+      read materials
+      mix=1 pn=1 end
+      mix=2 pn=1 end
+      end materials
+      
+      read collapse
+      13r1 21r2 20r3 5r4 12r5 181r6
+      end collapse
+      
+      read geom
+      global unit 10
+      cylinder 11 112.75 sides=24
+      cylinder 12 114.75 sides=24
+      media 1 1 11
+      media 2 1 12 -11
+      boundary 12 2 2
+      end geom
+      
+      read bounds
+      all=vacuum
+      end bounds
+      
+end
+
+1
+
+
+
+
+
+
+        ************************************************************************************************************************
+        ************************************************************************************************************************
+        ************************************************************************************************************************
+        *****                                                                                                              *****
+        *****                                       program verification information                                       *****
+        *****                                                                                                              *****
+        *****                                   code system:  SCALE    version:  6.2                                       *****
+        *****                                                                                                              *****
+        ************************************************************************************************************************
+        ************************************************************************************************************************
+        *****                                                                                                              *****
+        *****                                                                                                              *****
+        *****              program:  newt                                                                                  *****
+        *****                                                                                                              *****
+        *****        creation date:  30_mar_2017                                                                           *****
+        *****                                                                                                              *****
+        *****              library:  /home/smpark/projects/SCALE-6.2.2/bin                                                 *****
+        *****                                                                                                              *****
+        *****                                                                                                              *****
+        *****            prod code:  newt                                                                                  *****
+        *****                                                                                                              *****
+        *****              version:  6.2.2                                                                                 *****
+        *****                                                                                                              *****
+        *****              jobname:  smpark                                                                                *****
+        *****                                                                                                              *****
+        *****         machine name:  smpark-Precision-Tower-3420                                                           *****
+        *****                                                                                                              *****
+        *****    date of execution:  13_nov_2018                                                                           *****
+        *****                                                                                                              *****
+        *****    time of execution:  14:40:43.58                                                                           *****
+        *****                                                                                                              *****
+        *****                                                                                                              *****
+        ************************************************************************************************************************
+        ************************************************************************************************************************
+        ************************************************************************************************************************
+
+
+
+
+ ************************************************************************************************************************************
+       Execution stopped in STOPIT.  Error code = 101
+***Error:        Invalid input - Keywords "read XXXX" not found after title card.  Input cannot be processed.
+ ************************************************************************************************************************************
+
+    execution terminated due to errors. completion code 101. cpu time used 0.17 seconds
+
+    SCALE is finished on Tue Nov 13 14:40:43 2018.
+-------------------------- Summary --------------------------
+t-xsec finished. used 4.18 seconds.
+    terminated due to errors. completion code 101. used 0.17 seconds
+newt finished. used 0.17 seconds.
+SCALE driver required a maximum of 1213 MiB of RAM.
+------------------------ End Summary ------------------------
+

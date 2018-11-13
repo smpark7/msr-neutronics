@@ -18,14 +18,20 @@ cr 2 0 8.1071E-3 1030 end
 al 2 0 6.6957E-4 1030 end
 end comp
 
+end
+
 =newt
 
 2-D MSFR core region
 
 read materials
-  mix=1 pn=1 end
-  mix=2 pn=1 end
+mix=1 pn=1 end
+mix=2 pn=1 end
 end materials
+
+read collapse
+13r1 21r2 20r3 5r4 12r5 181r6
+end collapse
 
 read geom
 global unit 10

@@ -1,0 +1,54 @@
+'#TestGrep# "k-eff [=]" ${OUTPUTFILENAME}
+'#TestGrep# "Transport k[=]" ${OUTPUTFILENAME}
+'#TestGrep# -i "erro[r]" ${OUTPUTFILENAME} | ${GREP} -v "[W]arnings and [E]rrors"
+'#TestGrep# "SCALE is finishe[d]" ${OUTPUTFILENAME} | ${AWK} "{print $1,$2,$3}"
+'#TestGrep# "is finishe[d]\." ${OUTPUTFILENAME} | ${AWK} "{print $1,$2,$3,$4,$5,$6,$7}"
+' THIS SAMPLE PROBLEM TEST THE FOLLOWING: 
+'  ** t-newt sequence
+'  ** v7-252 group library
+'  ** centrm cross-section processing (default for t-newt calculations)
+'  ** parm=weight option for the t-newt sequence, which uses the NEWT collapse block to specify a 252 -> 56 group collapse.
+'  ** latticecell cross-section processing option
+=t-newt      parm=(2region,weight)
+MSFR unit cell model
+v7-238
+read comp 
+' fuel salt
+  wtptfuel  1 4.1249 5 92233 6.83517405 90232 51.529607 3007 6.075193 3006 0.00026044 9019 35.559766 1.0 973 end
+' fertile salt
+  wtptblank 2 4.1249 4 90232 58.352547 3007 6.076978 3006 0.00026051 9019 35.570215 1.0 973 end
+' Structural material
+  wtpthast  3 10.0  14 28000 79.432 74000 9.976 24000 8.014 42000 0.736 26000 0.632 22000 0.295 6000 0.294 25000 0.257 
+            14000 0.252 13000 0.052 5010 0.006534 5011 0.026466 15000 0.023 16000 0.004 1.0 973 end
+end comp
+read celldata
+  latticecell squarepitch pitch=250.0 3 fuelr=92.50 1 cladr=100.50 2 end
+end celldata
+read model
+238 group solution
+read parm
+'dz=188.0
+drawit=yes prtbroad=yes cmfd=3 xycmfd=2 sn=8 converge=mix echo=yes inners=2 epsilon=1e-3
+timed=yes prtmxsec=no prtmxtab=yes prthmmix=no
+end parm
+read materials
+  mix=1  pn=1 com="Fuel salt LiF-ThF4-233UF4" end
+  mix=2  pn=1 com="Fertile salt LiF4-ThF4"    end
+  mix=3  pn=1 com="Structural material"       end
+end materials
+read geom
+  global unit 1
+    cylinder 10 92.50  chord +x=0 chord +y=0 sides=128
+    cylinder 20 100.50 chord +x=0 chord +y=0 sides=128
+    cuboid   30 125. 0. 125. 0.
+    media 1 1 10
+    media 2 1 20 -10
+    media 3 1 30 -20
+  boundary 30 32 32
+end geom 
+' Depletion
+read bounds
+all=mirror
+end bounds
+end model
+end

@@ -1,6 +1,6 @@
-=t-xsec
+=t-newt
 
-2-D MSFR fuel with Ni-alloy structure
+2-D MSFR core region
 
 fine_n
 
@@ -18,32 +18,36 @@ cr 2 0 8.1071E-3 1030 end
 al 2 0 6.6957E-4 1030 end
 end comp
 
-end
+read model
 
-=newt
+6 group solution
 
-2-D MSFR core region
+read parm
+drawit=yes prtbroad=yes cmfd=3 xycmfd=2 sn=8 converge=mix echo=yes inners=2 epsilon=1e-3
+timed=yes prtmxsec=no prtmxtab=yes prthmmix=no
+end parm
 
 read materials
-mix=1 pn=1 end
-mix=2 pn=1 end
+  mix=1 pn=1 com="Fuel salt LiF-ThF4-233UF4" end
+  mix=2 pn=1 com="Structural material" end
 end materials
 
 read collapse
-13r1 21r2 20r3 5r4 12r5 181r6
+  13r1 21r2 20r3 5r4 12r5 181r6
 end collapse
 
 read geom
-global unit 10
-cylinder 11 112.75 sides=24
-cylinder 12 114.75 sides=24
-media 1 1 11
-media 2 1 12 -11
-boundary 12 2 2
+  global unit 10
+    cylinder 11 112.75 sides=24
+    cylinder 12 114.75 sides=24
+    media 1 1 11
+    media 2 1 12 -11
+  boundary 12 2 2
 end geom
 
 read bounds
 all=vacuum
 end bounds
+end model
 
 end

@@ -38,11 +38,12 @@ end collapse
 
 read geom
   global unit 10
-    cylinder 11 112.75 sides=24
-    cylinder 12 114.75 sides=24
+    cylinder 11 112.75 sides=128
+'    cylinder 12 114.75 sides=128
+    hexprism 12 114.75
     media 1 1 11
     media 2 1 12 -11
-  boundary 12 2 2
+  boundary 12 4 4
 end geom
 
 read bounds

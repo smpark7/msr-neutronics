@@ -1,0 +1,81 @@
+% --- MSFR
+
+set title "MSFR simplified core"
+
+/************************
+ * Material definitions *
+ ************************/
+
+% --- Fuel salt
+
+mat fuel        -4.0751         tmp 1030
+92233.09c       -0.2088410              % U-233
+90232.09c       -0.3750755              % Th-232
+3007.09c        -0.0607201              % Li-7
+9019.09c        -0.3553635              % F-19
+
+/************************
+ * Geometry definitions *
+ ************************/
+
+% --- Surfaces
+
+surf 101 cyl 0.0 0.0 50.0 0.0 100.0              % Cylinder
+surf 102 inf
+
+% --- Cells
+
+cell 1001 0 fill 1  -101             % Fuel core
+cell 1002 0 outside 101 -102              % Outside cylinder
+cell 1003 1 fuel  -102        % Fuel material
+
+/******************
+ * Run parameters *
+ ******************/
+
+% --- Neutron population
+
+set pop 200000 500 50
+set gcu 1 
+set nfg  2      748.5e-6
+set nbuf 20.0
+
+% --- Fission
+
+set acelib "/projects/sciteam/bahg/serpent/xsdata/jeff312/sss_jeff312.xsdata"
+
+det fisxy
+dr -6 fuel 
+dx -60 60 240
+dy -60 60 240
+dz 0.0 100 1
+
+% --- Branch
+
+branch fuel0 
+stp fuel    -4.18976    900
+
+branch fuel1
+stp fuel    -4.14566    950
+
+branch fuel2
+stp fuel    -4.10156    1000
+
+branch fuel3
+stp fuel    -4.0751     1030
+
+branch fuel4
+stp fuel    -4.05746    1050
+
+branch fuel5
+stp fuel    -4.01336    1100
+
+branch fuel6
+stp fuel    -3.96926    1150
+
+branch fuel7
+stp fuel    -3.92516    1200
+
+coef 1
+0
+8 fuel0 fuel1 fuel2 fuel3 fuel4 fuel5 fuel6 fuel7

@@ -1,1 +1,1 @@
-fuel 0
+fuel 1

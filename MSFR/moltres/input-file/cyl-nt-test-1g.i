@@ -1,16 +1,16 @@
-flow_velocity=0 # cm/s
+flow_velocity=10 # cm/s
 nt_scale=1e13     # neutron flux scaling factor
-ini_temp=930     # initial temp
-diri_temp=1030    # dirichlet BC temp
+ini_temp=750     # initial temp
+diri_temp=750    # dirichlet BC temp
 
 [GlobalParams]
-  num_groups = 2
+  num_groups = 1
   num_precursor_groups = 8
   use_exp_form = false
-  group_fluxes = 'group1 group2'
+  group_fluxes = 'group1'
   temperature = temp
   sss2_input = true
-  #pre_concs = 'pre1 pre2 pre3 pre4 pre5 pre6 pre7 pre8'
+  pre_concs = 'pre1 pre2 pre3 pre4 pre5 pre6 pre7 pre8'
   account_delayed = false
 []
 
@@ -30,32 +30,26 @@ diri_temp=1030    # dirichlet BC temp
     initial_condition = 2e8
     scaling = 1e4
   [../]
-  [./group2]
-    order = FIRST
-    family = LAGRANGE
-    initial_condition = 1e6
-    scaling = 1e4
-  [../]
   [./temp]
     initial_condition = ${ini_temp}
     scaling = 1e-4
   [../]
 []
 
-#[Precursors]
-#  [./pres]
-#    var_name_base = pre
-#    block = 'fuel'
-#    outlet_boundaries = 'top bottom outer'
-#    u_def = 0
-#    v_def = ${flow_velocity}
-#    w_def = 0
-#    nt_exp_form = false
-#    family = MONOMIAL
-#    order = CONSTANT
-#    # jac_test = true   # jacobian test
-#  [../]
-#[]
+[Precursors]
+  [./pres]
+    var_name_base = pre
+    block = 'fuel'
+    outlet_boundaries = 'top bottom outer'
+    u_def = 0
+    v_def = ${flow_velocity}
+    w_def = 0
+    nt_exp_form = false
+    family = MONOMIAL
+    order = CONSTANT
+    # jac_test = true   # jacobian test
+  [../]
+[]
 
 [Kernels]
   # Neutronics
@@ -80,50 +74,12 @@ diri_temp=1030    # dirichlet BC temp
     group_number = 1
     block = 'fuel'
   [../]
-  # [./delayed_group1]
-  #   type = DelayedNeutronSource
-  #   variable = group1
-  #   block = 'fuel'
-  #   group_number=1
-  # [../]
-  [./inscatter_group1]
-    type = InScatter
+  [./delayed_group1]
+    type = DelayedNeutronSource
     variable = group1
-    group_number = 1
-  [../]
-
-  [./diff_group2]
-    type = GroupDiffusion
-    variable = group2
-    group_number = 2
-  [../]
-  [./sigma_r_group2]
-    type = SigmaR
-    variable = group2
-    group_number = 2
-  [../]
-  [./time_group2]
-    type = NtTimeDerivative
-    variable = group2
-    group_number = 2
-  [../]
-  [./fission_source_group2]
-    type = CoupledFissionKernel
-    variable = group2
-    group_number = 2
     block = 'fuel'
+    group_number=1
   [../]
-  [./inscatter_group2]
-    type = InScatter
-    variable = group2
-    group_number = 2
-  [../]
-  # [./delayed_group2]
-  #   type = DelayedNeutronSource
-  #   variable = group2
-  #   block = 'fuel'
-  #   group_number=2
-  # [../]
 
   # Temperature
   [./temp_time_derivative]
@@ -150,31 +106,14 @@ diri_temp=1030    # dirichlet BC temp
 []
 
 [BCs]
-  # [./vacuum_group1]
-  #   type = VacuumConcBC
-  #   boundary = 'bottom top outer'
-  #   variable = group1
-  # [../]
-  # [./vacuum_group2]
-  #   type = VacuumConcBC
-  #   boundary = 'bottom top outer'
-  #   variable = group2
-  # [../]
   [./vacuum_group1]
-    type = NeumannBC
+    type = VacuumBC
     boundary = 'bottom top outer'
     variable = group1
-    value = '0'
-  [../]
-  [./vacuum_group2]
-    type = NeumannBC
-    boundary = 'bottom top outer'
-    variable = group2
-    value = '0'
   [../]
   [./temp_diri_cg]
     boundary = 'outer'
-    type = FunctionDirichletBC
+    type = NeumannBC
     function = 'temp_bc_func'
     variable = temp
   [../]
@@ -186,29 +125,29 @@ diri_temp=1030    # dirichlet BC temp
   # [../]
   [./temp_diri_top]
    boundary = 'top'
-   type = DirichletBC
+   type = NeumannBC
    variable = temp
-   value = '930'
+   value = '750'
   [../]
   [./temp_diri_bot]
    boundary = 'bottom'
-   type = DirichletBC
+   type = NeumannBC
    variable = temp
-   value = '930'
+   value = '750'
   [../]
 []
 
 [Functions]
   [./temp_bc_func]
     type = ParsedFunction
-    value = '930'
+    value = '750'
   [../]
 []
 
 [Materials]
   [./fuel]
     type = GenericMoltresMaterial
-    property_tables_root = '../input-data/cyl_nt_test/data3/cyl_fuel_'
+    property_tables_root = '../input-data/cyl_nt_test/data4/cyl_fuel_'
     interp_type = 'spline'
     block = 'fuel'
     prop_names = 'k cp'     # conductivity, capacity
@@ -265,11 +204,6 @@ diri_temp=1030    # dirichlet BC temp
   [./group1_current]
     type = IntegralNewVariablePostprocessor
     variable = group1
-    outputs = 'console exodus'
-  [../]
-  [./group2_current]
-    type = IntegralNewVariablePostprocessor
-    variable = group2
     outputs = 'console exodus'
   [../]
   [./temp_fuel]

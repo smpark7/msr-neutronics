@@ -1,16 +1,16 @@
-flow_velocity=10 # cm/s
+flow_velocity=0 # cm/s
 nt_scale=1e13     # neutron flux scaling factor
 ini_temp=950     # initial temp
 diri_temp=950    # dirichlet BC temp
 
 [GlobalParams]
   num_groups = 1
-  num_precursor_groups = 8
+  num_precursor_groups = 6
   use_exp_form = false
   group_fluxes = 'group1'
   temperature = temp
-  sss2_input = true
-  pre_concs = 'pre1 pre2 pre3 pre4 pre5 pre6 pre7 pre8'
+  sss2_input = false
+  pre_concs = 'pre1 pre2 pre3 pre4 pre5 pre6'
   account_delayed = false
 []
 
@@ -122,18 +122,18 @@ diri_temp=950    # dirichlet BC temp
     function = 'temp_bc_func'
     variable = temp
   [../]
-  [./temp_advection_outlet]
-    boundary = 'top'
-    type = TemperatureOutflowBC
-    variable = temp
-    velocity = '0 ${flow_velocity} 0'
-  [../]
-  #[./temp_diri_top]
-  # boundary = 'top'
-  # type = DirichletBC
-  # variable = temp
-  # value = '950'
+  #[./temp_advection_outlet]
+  #  boundary = 'top'
+  #  type = TemperatureOutflowBC
+  #  variable = temp
+  #  velocity = '0 ${flow_velocity} 0'
   #[../]
+  [./temp_diri_top]
+   boundary = 'top'
+   type = DirichletBC
+   variable = temp
+   value = '950'
+  [../]
   [./temp_diri_bot]
    boundary = 'bottom'
    type = DirichletBC
@@ -152,7 +152,7 @@ diri_temp=950    # dirichlet BC temp
 [Materials]
   [./fuel]
     type = GenericMoltresMaterial
-    property_tables_root = '../input-data/cyl_nt_test/data7/cyl_fuel_'
+    property_tables_root = '../input-data/cyl_nt_test/newt_data/cyl_nt_test_fuel_'
     interp_type = 'spline'
     block = 'fuel'
     prop_names = 'k cp'     # conductivity, capacity
@@ -170,7 +170,7 @@ diri_temp=950    # dirichlet BC temp
 
 [Executioner]
   type = Transient
-  end_time = 1000000
+  end_time = 1e-3 #1000000
 
   nl_rel_tol = 1e-6
   nl_abs_tol = 1e-6

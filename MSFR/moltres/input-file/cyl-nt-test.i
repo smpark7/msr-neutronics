@@ -27,13 +27,13 @@ diri_temp=1030    # dirichlet BC temp
   [./group1]
     order = FIRST
     family = LAGRANGE
-    initial_condition = 2e8
+    initial_condition = 1
     scaling = 1e4
   [../]
   [./group2]
     order = FIRST
     family = LAGRANGE
-    initial_condition = 1e6
+    initial_condition = 1
     scaling = 1e4
   [../]
   [./temp]

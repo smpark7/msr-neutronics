@@ -29,7 +29,7 @@ read model
 read parm
 'dz=188.0
 drawit=yes prtbroad=yes cmfd=3 xycmfd=2 sn=8 converge=mix echo=yes inners=2 epsilon=1e-3
-timed=yes prtmxsec=no prtmxtab=yes prthmmix=no
+timed=yes prtmxsec=yes prtmxtab=yes prthmmix=no
 end parm
 read materials
   mix=1  pn=1 com="Fuel salt LiF-ThF4-233UF4" end

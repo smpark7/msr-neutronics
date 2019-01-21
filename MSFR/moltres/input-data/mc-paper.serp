@@ -9,10 +9,10 @@ set title "MSFR simplified core"
 % --- Fuel salt
 
 mat fuel     	-4.0751 	tmp 1030
-92233.09c	-0.0679168		% U-233
-90232.09c	-0.5157708		% Th-232
-3007.09c	-0.0606307		% Li-7
-9019.09c	-0.3556816		% F-19
+92233.09c	-0.0703517		% U-233
+90232.09c	-0.5133169		% Th-232
+3007.09c	-0.0607562		% Li-7
+9019.09c	-0.3555752		% F-19
 
 % --- Blanket salt
 
@@ -63,53 +63,44 @@ mat absorb     	-2.52 		tmp 1030
 
 % --- Surfaces
 
-surf 1001 pz 0.0		% Reflector bottom outer surface
-surf 1002 pz 100.0 		% Reflector bottom inner surface
-surf 1003 pz 325.5		% Reflector top inner surface
-surf 1004 pz 425.5		% Reflector top outer surface
+surf 1001 pz 0.0		% Bottom surface
+surf 1002 pz 2.0 		% Blanket bottom inner surface
+surf 1003 pz 186.0		% Blanket top inner surface
+surf 1004 pz 188.0		% Top outer surface
 
-surf 2001 cyl 0.0 0.0 112.75 118.75 306.75		% Blanket outer surface, fuel side
-surf 2002 cyl 0.0 0.0 162.75 118.75 306.75		% Blanket outer surface, boron side/absorber boundary
-surf 2003 cyl 0.0 0.0 114.75 120.75 304.75		% Blanket inner surface, fuel side
-surf 2004 cyl 0.0 0.0 160.75 120.75 304.75		% Blanket inner surface, boron side
-surf 2005 pz 118.75								% Blanket/absorber bottom surface
-surf 2006 pz 306.75 							% Blanket/absorber top surface
-surf 2007 pz 120.75								% Blanket bottom inner surface
-surf 2008 pz 304.75								% Blanket upper inner surface
+surf 2001 cyl 0.0 0.0 112.75 0.0 188.0		% Blanket outer surface, fuel side
+surf 2002 cyl 0.0 0.0 114.75 0.0 188.0		% Blanket inner surface, fuel side
+surf 2003 cyl 0.0 0.0 160.75 0.0 188.0		% Blanket inner surface, boron side
+surf 2004 cyl 0.0 0.0 162.75 0.0 188.0		% Blanket outer surface, boron side/absorber boundary
+surf 2005 cyl 0.0 0.0 182.75 0.0 188.0		% Absorber outer surface
+surf 2006 cyl 0.0 0.0 206.5  0.0 188.0		% HX outer surface
+surf 2007 cyl 0.0 0.0 226.5  0.0 188.0		% Struc outer surface
 
-surf 3001 cyl 0.0 0.0 182.75 0.0 425.5		%Outer cylinder boundary
-
-surf 4001 inf
+surf 3001 inf
 
 % --- Cells
 
-cell 101 0 fill 2 1001 -1002 -3001		% Bottom reflector plate
-cell 102 0 fill 2 1003 -1004 -3001		% Top reflector plate
+cell 101 0 fill 1 -2001		% Fuel core
 
-cell 201 0 fill 1  2005 -2006 -2001		% Fuel core
-cell 202 0 fill 1  1002 -2005 -3001		% Fuel inlet
-cell 203 0 fill 1  2006 -1003 -3001		% Fuel outlet
+cell 201 0 fill 3 2002 -2003 1002 -1003		% Blanket
 
-cell 301 0 fill 3 2007 -2008 2003 -2004		% Blanket
+cell 301 0 fill 2 2001 -2002		% Blanket tank inner
+cell 302 0 fill 2 2003 -2004		% Blanket tank outer
+cell 303 0 fill 2 2002 -2003 1001 -1002		% Blanket tank bottom
+cell 304 0 fill 2 2002 -2003 1003 -1004		% Blanket tank top
 
-cell 401 0 fill 2 2001 -2003 2007 -2008		% Blanket tank inner
-cell 402 0 fill 2 2004 -2002 2007 -2008		% Blanket tank outer
-cell 403 0 fill 2 2005 -2007 2001 -2002		% Blanket tank bottom
-cell 404 0 fill 2 2008 -2006 2001 -2002		% Blanket tank top
+cell 401 0 fill 4 2004 -2005		% Absorber
 
-cell 501 0 fill 4 2005 -2006 2002 -3001		% Absorber
+cell 501 0 fill 2 2005 -2006		% HX and pump
 
-cell 601 0 outside 3001 1001 -1004		% Outside cylinder
-cell 602 0 outside -1001				% Outside bottom
-cell 603 0 outside 1004					% Outside top
+cell 601 0 fill 2 2006 -2007
 
-cell 701 1 fuel  -4001		% Fuel material
+cell 701 0 outside 2007		% Outside cylinder
 
-cell 702 2 struc -4001		% Structural material
-
-cell 703 3 blanket	-4001	% Blanket material
-
-cell 704 4 absorb	-4001	% Absorber material
+cell 801 1 fuel		-3001	% Fuel material
+cell 802 2 struc	-3001	% Structural material
+cell 803 3 blanket	-3001	% Blanket material
+cell 804 4 absorb	-3001	% Absorber material
 
 /******************
  * Run parameters *
@@ -122,21 +113,25 @@ set pop 200000 500 50
 
 % --- Geometry plots
 
-plot 3 1000 1000 50.0 -190.0 190.0 -190.0 190.0
+% plot 3 1000 1000 50.0 -190.0 190.0 -190.0 190.0
 
-plot 3 1000 1000 110.0 -190.0 190.0 -190.0 190.0
+% plot 3 1000 1000 110.0 -190.0 190.0 -190.0 190.0
 
-plot 3 1000 1000 200.0 -190.0 190.0 -190.0 190.0
+% plot 3 1000 1000 200.0 -190.0 190.0 -190.0 190.0
 
-plot 3 1000 1000 320.0 -190.0 190.0 -190.0 190.0
+% plot 3 1000 1000 320.0 -190.0 190.0 -190.0 190.0
 
-plot 3 1000 1000 375.0 -190.0 190.0 -190.0 190.0
+% plot 3 1000 1000 375.0 -190.0 190.0 -190.0 190.0
 
-plot 1 1000 1000 0.0 -190.0 190.0 -10.0 450.0
+% plot 1 1000 1000 0.0 -190.0 190.0 -10.0 450.0
 
-mesh 3 1000 1000 0 -190 190 -190 190 200 225
+% mesh 3 1000 1000 0 -190 190 -190 190 200 225
 
-mesh 1 1000 1000 0 -1 1 -190 190 -10 450
+% mesh 1 1000 1000 0 -1 1 -190 190 -10 450
+
+% mesh 3 1000 1000 0 -190 190 -190 190 200 225
+
+% mesh 1 1000 1000 0 -1 1 -190 190 -10 450
 
 % --- Neutron energy spectrum
 
@@ -303,6 +298,54 @@ stp blanket -3.92516    1200
 stp struc   -10         1200
 stp absorb  -2.52       1200
 
+branch absorb0
+stp fuel    -4.18976    900
+stp blanket -4.18976    900
+stp struc   -10         900
+stp absorb  -2.52       900
+
+branch absorb1
+stp fuel    -4.14566    950
+stp blanket -4.14566    950
+stp struc   -10         950
+stp absorb  -2.52       950
+
+branch absorb2
+stp fuel    -4.10156    1000
+stp blanket -4.10156    1000
+stp struc   -10         1000
+stp absorb  -2.52       1000
+
+branch absorb3
+stp fuel    -4.0751     1030
+stp blanket -4.0751     1030
+stp struc   -10         1030
+stp absorb  -2.52       1030
+
+branch absorb4
+stp fuel    -4.05746    1050
+stp blanket -4.05746    1050
+stp struc   -10         1050
+stp absorb  -2.52       1050
+
+branch absorb5
+stp fuel    -4.01336    1100
+stp blanket -4.01336    1100
+stp struc   -10         1100
+stp absorb  -2.52       1100
+
+branch absorb6
+stp fuel    -3.96926    1150
+stp blanket -3.96926    1150
+stp struc   -10         1150
+stp absorb  -2.52       1150
+
+branch absorb7
+stp fuel    -3.92516    1200
+stp blanket -3.92516    1200
+stp struc   -10         1200
+stp absorb  -2.52       1200
+
 coef 1
 0
-24 fuel0 fuel1 fuel2 fuel3 fuel4 fuel5 fuel6 fuel7 blanket0 blanket1 blanket2 blanket3 blanket4 blanket5 blanket6 blanket7 struc0 struc1 struc2 struc3 struc4 struc5 struc6 struc7
+32 fuel0 fuel1 fuel2 fuel3 fuel4 fuel5 fuel6 fuel7 blanket0 blanket1 blanket2 blanket3 blanket4 blanket5 blanket6 blanket7 struc0 struc1 struc2 struc3 struc4 struc5 struc6 struc7 absorb0 absorb1 absorb2 absorb3 absorb4 absorb5 absorb6 absorb7

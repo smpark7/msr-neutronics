@@ -1,0 +1,75 @@
+'#TestGrep# "k-eff [=]" ${OUTPUTFILENAME}
+'#TestGrep# -i "erro[r]" ${OUTPUTFILENAME} | ${GREP} -v "[W]arnings and [E]rrors"
+'#TestGrep# "SCALE is finishe[d]" ${OUTPUTFILENAME} | ${AWK} "{print $1,$2,$3}"
+'#TestGrep# "is finishe[d]\." ${OUTPUTFILENAME} | ${AWK} "{print $1,$2,$3,$4,$5,$6,$7}"
+=t-newt
+
+2-D MSFR core mc paper
+
+fine_n
+
+read comp
+'fuel
+WTPTfuel 1 4.18976 4 92233 20.884 90232 37.508 3007 6.072 9019 35.536 1.0 1030 end
+WTPTblanket 2 4.18976 3 90232 58.357 3007 6.065 9019 35.578 end
+WTPTstruc 3 10 15 28058 45.626 28060 18.044 28061 0.794 28062 2.565 28064 0.671 74180 .035 74182 7.572 74183 0.041 74184 8.936 74186 8.416 24050 0.293 24052 5.859 24053 0.677 24054 0.171 13027 0.300 end
+WTPTabsorb 4 2.52 2 5010 76.923 6000 23.077 end
+end comp
+
+read model
+
+6 group solution
+
+read parm
+solntype=keff
+height=188
+collapse=yes
+prtmxsec=yes
+' prtbroad=yes
+' prthmmix=yes
+' prtflux=yes
+end parm
+
+read hmog
+501 fuel 1 end
+502 blanket 2 end
+503 struc 3 end
+504 absorb 4 end
+end hmog
+
+read materials
+  mix=1 pn=1 com="Fuel salt LiF-ThF4-233UF4" end
+  mix=2 pn=1 com="Blanket salt LiF-ThF4" end
+  mix=3 pn=1 com="Structural material" end
+  mix=4 pn=1 com="Boron carbide absorber" end
+end materials
+
+read collapse
+  13r1 21r2 20r3 5r4 12r5 181r6
+end collapse
+
+read geom
+  global unit 10
+    cylinder 11 112.75 sides=128
+    cylinder 12 114.75 sides=128
+    cylinder 13 160.75 sides=128
+    cylinder 14 162.75 sides=128
+    cylinder 15 182.75 sides=128
+    cylinder 16 206.50 sides=128
+    hexprism 17 226.50 sides=128
+    media 1 1 11
+    media 3 1 12 -11
+    media 2 1 13 -12
+    media 3 1 14 -13
+    media 4 1 15 -14
+    media 3 1 16 -15
+    media 3 1 17 -16
+  boundary 17 4 4
+end geom
+
+read bounds
+all=vacuum
+end bounds
+
+end model
+end

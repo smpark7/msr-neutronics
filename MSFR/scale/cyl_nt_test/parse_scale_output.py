@@ -15,7 +15,7 @@ temps = [temp for temp in range(start, stop + step, step)]
 
 all_files = [file_base + str(temp) + '.out' for temp in temps]
 
-num_groups = 1
+num_groups = 6
 num_precursor_groups = 6
 
 fuel_xsecs = []

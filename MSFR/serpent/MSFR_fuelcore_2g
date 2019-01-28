@@ -42,7 +42,7 @@ set nbuf 20.0
 
 % --- Fission
 
-set acelib "/projects/sciteam/bahg/serpent/xsdata/jeff312/sss_jeff312.xsdata"
+%set acelib "/projects/sciteam/bahg/serpent/xsdata/jeff312/sss_jeff312.xsdata"
 
 det fisxy
 dr -6 fuel 

@@ -1,4 +1,4 @@
-flow_velocity=10 # cm/s
+flow_velocity=0 # cm/s
 nt_scale=1e13     # neutron flux scaling factor
 ini_temp=950     # initial temp
 diri_temp=950    # dirichlet BC temp
@@ -156,7 +156,7 @@ diri_temp=950    # dirichlet BC temp
     interp_type = 'spline'
     block = 'fuel'
     prop_names = 'k cp'     # conductivity, capacity
-    prop_values = '.01014 1752'   # W cm-1 K-1, J kg-1 K-1
+    prop_values = '.01014 1355'   # W cm-1 K-1, J kg-1 K-1
   [../]
   [./rho_fuel]
     type = DerivativeParsedMaterial

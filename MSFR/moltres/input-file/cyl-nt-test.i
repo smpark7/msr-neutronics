@@ -226,7 +226,7 @@ diri_temp=1030    # dirichlet BC temp
 
 [Executioner]
   type = Transient
-  end_time = 1000000
+  end_time = 1e-3 #1000000
 
   nl_rel_tol = 1e-6
   nl_abs_tol = 1e-6
@@ -247,7 +247,7 @@ diri_temp=1030    # dirichlet BC temp
   # dt = 1e-3
   [./TimeStepper]
     type = IterationAdaptiveDT
-    dt = 1e-3
+    dt = 1e-5
     cutback_factor = 0.4
     growth_factor = 1.2
     optimal_iterations = 20

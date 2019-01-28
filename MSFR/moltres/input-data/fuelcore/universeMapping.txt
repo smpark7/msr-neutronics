@@ -1,2 +1,1 @@
 fuel 1
-struc 2

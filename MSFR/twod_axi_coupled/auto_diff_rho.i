@@ -1,7 +1,7 @@
-flow_velocity=120 # cm/s. See MSRE-properties.ods
+flow_velocity=21.7 # cm/s. See MSRE-properties.ods
 nt_scale=1e13
-ini_temp=923
-diri_temp=923
+ini_temp=922
+diri_temp=922
 
 [GlobalParams]
   num_groups = 2
@@ -15,8 +15,8 @@ diri_temp=923
 []
 
 [Mesh]
-  # file = '2d_lattice_structured.msh'
-  file = 'msfr_fuel_core_2d.e'
+  file = '2d_lattice_structured.msh'
+  # file = '2d_lattice_structured_jac.msh'
 [../]
 
 [Problem]
@@ -46,7 +46,7 @@ diri_temp=923
   [./pres]
     var_name_base = pre
     block = 'fuel'
-    outlet_boundaries = 'fuel_top'
+    outlet_boundaries = 'fuel_tops'
     u_def = 0
     v_def = ${flow_velocity}
     w_def = 0
@@ -133,7 +133,7 @@ diri_temp=923
   #   type = GammaHeatSource
   #   variable = temp
   #   gamma = .0144 # Cammi .0144
-  #   block = 'struc'
+  #   block = 'moder'
   #   average_fission_heat = 'average_fission_heat'
   # [../]
   [./temp_diffusion]
@@ -152,44 +152,25 @@ diri_temp=923
 [BCs]
   [./vacuum_group1]
     type = VacuumConcBC
-    boundary = 'fuel_bottom fuel_top struc_bottom struc_top outer_wall'
+    boundary = 'fuel_bottoms fuel_tops moder_bottoms moder_tops outer_wall'
     variable = group1
   [../]
   [./vacuum_group2]
     type = VacuumConcBC
-    boundary = 'fuel_bottom fuel_top struc_bottom struc_top outer_wall'
+    boundary = 'fuel_bottoms fuel_tops moder_bottoms moder_tops outer_wall'
     variable = group2
   [../]
-  # [./reflect_group1]
-  #   type = NeumannBC
-  #   boundary = 'fuel_bottom fuel_top struc_bottom struc_top outer_wall'
-  #   variable = group1
-  #   value = '0'
-  # [../]
-  # [./reflect_group2]
-  #   type = NeumannBC
-  #   boundary = 'fuel_bottom fuel_top struc_bottom struc_top outer_wall'
-  #   variable = group2
-  #   value = '0'
-  # [../]
   [./temp_diri_cg]
-    # boundary = 'struc_bottom fuel_bottom outer_wall'
-    boundary = 'struc_bottom fuel_bottom'
+    boundary = 'moder_bottoms fuel_bottoms outer_wall'
     type = FunctionDirichletBC
     function = 'temp_bc_func'
     variable = temp
   [../]
-  # [./temp_advection_outlet]
-  #   boundary = 'fuel_top'
-  #   type = TemperatureOutflowBC
-  #   variable = temp
-  #   velocity = '0 ${flow_velocity} 0'
-  # [../]
-  [./temp_diri_outlet]
-    boundary = 'fuel_top'
-    type = DirichletBC
-    value = '1023'
+  [./temp_advection_outlet]
+    boundary = 'fuel_tops'
+    type = TemperatureOutflowBC
     variable = temp
+    velocity = '0 ${flow_velocity} 0'
   [../]
 []
 
@@ -203,35 +184,35 @@ diri_temp=923
 [Materials]
   [./fuel]
     type = GenericMoltresMaterial
-    property_tables_root = './data/newt_msre_fuel_'
+    property_tables_root = './data3/newt_msre_fuel_'
     interp_type = 'spline'
     block = 'fuel'
     prop_names = 'k cp'
-    prop_values = '.01014 1752' # Robertson MSRE technical report @ 922 K
+    prop_values = '.0553 1967' # Robertson MSRE technical report @ 922 K
   [../]
   [./rho_fuel]
     type = DerivativeParsedMaterial
     f_name = rho
-    function = '(4983.56 - .882 * temp) * .000001'
+    function = '2.146e-3 * exp(-1.8 * 1.18e-4 * (temp - 922))'
     args = 'temp'
     derivative_order = 1
     block = 'fuel'
   [../]
-  [./struc]
+  [./moder]
     type = GenericMoltresMaterial
     property_tables_root = './data/newt_msre_mod_'
     interp_type = 'spline'
     prop_names = 'k cp'
-    prop_values = '.25 1560' # Cammi 2011 at 908 K
-    block = 'struc'
+    prop_values = '.312 1760' # Cammi 2011 at 908 K
+    block = 'moder'
   [../]
-  [./rho_struc]
+  [./rho_moder]
     type = DerivativeParsedMaterial
     f_name = rho
-    function = '(10 - .0000001 * temp) * 0.001'
+    function = '1.86e-3 * exp(-1.8 * 1.0e-5 * (temp - 922))'
     args = 'temp'
     derivative_order = 1
-    block = 'struc'
+    block = 'moder'
   [../]
 []
 
@@ -250,7 +231,7 @@ diri_temp=923
    # petsc_options_iname = '-snes_type'
   # petsc_options_value = 'test'
 
-  nl_max_its = 100
+  nl_max_its = 30
   l_max_its = 100
 
   dtmin = 1e-5
@@ -295,10 +276,10 @@ diri_temp=923
     block = 'fuel'
     outputs = 'exodus console'
   [../]
-  [./temp_struc]
+  [./temp_moder]
     type = ElementAverageValue
     variable = temp
-    block = 'struc'
+    block = 'moder'
     outputs = 'exodus console'
   [../]
   # [./average_fission_heat]

@@ -5,17 +5,17 @@ diri_temp=1030    # dirichlet BC temp
 
 [GlobalParams]
   num_groups = 2
-  num_precursor_groups = 8
+  num_precursor_groups = 6
   use_exp_form = false
   group_fluxes = 'group1 group2'
   temperature = temp
-  sss2_input = true
-  #pre_concs = 'pre1 pre2 pre3 pre4 pre5 pre6 pre7 pre8'
-  account_delayed = false
+  sss2_input = false
+  pre_concs = 'pre1 pre2 pre3 pre4 pre5 pre6'
+  account_delayed = true
 []
 
 [Mesh]
-  file = 'cyl.msh'
+  file = 'cyl_nt_test_mesh.e'
 [../]
 
 [Problem]
@@ -42,20 +42,20 @@ diri_temp=1030    # dirichlet BC temp
   [../]
 []
 
-#[Precursors]
-#  [./pres]
-#    var_name_base = pre
-#    block = 'fuel'
-#    outlet_boundaries = 'top bottom outer'
-#    u_def = 0
-#    v_def = ${flow_velocity}
-#    w_def = 0
-#    nt_exp_form = false
-#    family = MONOMIAL
-#    order = CONSTANT
-#    # jac_test = true   # jacobian test
-#  [../]
-#[]
+[Precursors]
+  [./pres]
+    var_name_base = pre
+    block = 'fuel'
+    outlet_boundaries = 'top bottom'
+    u_def = 0
+    v_def = ${flow_velocity}
+    w_def = 0
+    nt_exp_form = false
+    family = MONOMIAL
+    order = CONSTANT
+    # jac_test = true   # jacobian test
+  [../]
+[]
 
 [Kernels]
   # Neutronics
@@ -80,12 +80,12 @@ diri_temp=1030    # dirichlet BC temp
     group_number = 1
     block = 'fuel'
   [../]
-  # [./delayed_group1]
-  #   type = DelayedNeutronSource
-  #   variable = group1
-  #   block = 'fuel'
-  #   group_number=1
-  # [../]
+  [./delayed_group1]
+    type = DelayedNeutronSource
+    variable = group1
+    block = 'fuel'
+    group_number=1
+  [../]
   [./inscatter_group1]
     type = InScatter
     variable = group1
@@ -118,12 +118,12 @@ diri_temp=1030    # dirichlet BC temp
     variable = group2
     group_number = 2
   [../]
-  # [./delayed_group2]
-  #   type = DelayedNeutronSource
-  #   variable = group2
-  #   block = 'fuel'
-  #   group_number=2
-  # [../]
+  [./delayed_group2]
+    type = DelayedNeutronSource
+    variable = group2
+    block = 'fuel'
+    group_number=2
+  [../]
 
   # Temperature
   [./temp_time_derivative]
@@ -141,55 +141,61 @@ diri_temp=1030    # dirichlet BC temp
     D_name = 'k'
     variable = temp
   [../]
-  # [./temp_advection_fuel]
-  #   type = ConservativeTemperatureAdvection
-  #   velocity = '0 ${flow_velocity} 0'
-  #   variable = temp
-  #   block = 'fuel'
-  # [../]
+  [./temp_advection_fuel]
+    type = ConservativeTemperatureAdvection
+    velocity = '0 ${flow_velocity} 0'
+    variable = temp
+    block = 'fuel'
+  [../]
 []
 
 [BCs]
-  # [./vacuum_group1]
-  #   type = VacuumConcBC
-  #   boundary = 'bottom top outer'
-  #   variable = group1
-  # [../]
-  # [./vacuum_group2]
-  #   type = VacuumConcBC
-  #   boundary = 'bottom top outer'
-  #   variable = group2
-  # [../]
   [./vacuum_group1]
-    type = NeumannBC
+    type = VacuumConcBC
     boundary = 'bottom top outer'
     variable = group1
-    value = '0'
   [../]
   [./vacuum_group2]
-    type = NeumannBC
+    type = VacuumConcBC
     boundary = 'bottom top outer'
     variable = group2
-    value = '0'
   [../]
+  #[./vacuum_group1]
+  #  type = NeumannBC
+  #  boundary = 'bottom top outer'
+  #  variable = group1
+  #  value = '0'
+  #[../]
+  #[./vacuum_group2]
+  #  type = NeumannBC
+  #  boundary = 'bottom top outer'
+  #  variable = group2
+  #  value = '0'
+  #[../]
+  #[./temp_diri_cg]
+  #  boundary = 'outer'
+  #  type = FunctionDirichletBC
+  #  function = 'temp_bc_func'
+  #  variable = temp
+  #[../]
   [./temp_diri_cg]
     boundary = 'outer'
-    type = FunctionDirichletBC
-    function = 'temp_bc_func'
+    type = DirichletBC
     variable = temp
+    value = '930'
   [../]
-  # [./temp_advection_outlet]
-  #   boundary = 'top'
-  #   type = TemperatureOutflowBC
-  #   variable = temp
-  #   velocity = '0 ${flow_velocity} 0'
-  # [../]
-  [./temp_diri_top]
-   boundary = 'top'
-   type = DirichletBC
-   variable = temp
-   value = '930'
+  [./temp_advection_outlet]
+    boundary = 'top'
+    type = TemperatureOutflowBC
+    variable = temp
+    velocity = '0 ${flow_velocity} 0'
   [../]
+  #[./temp_diri_top]
+  # boundary = 'top'
+  # type = DirichletBC
+  # variable = temp
+  # value = '930'
+  #[../]
   [./temp_diri_bot]
    boundary = 'bottom'
    type = DirichletBC
@@ -208,11 +214,13 @@ diri_temp=1030    # dirichlet BC temp
 [Materials]
   [./fuel]
     type = GenericMoltresMaterial
-    property_tables_root = '../input-data/cyl_nt_test/data3/cyl_fuel_'
+#    property_tables_root = '../../twod_axi_coupled/data3/newt_msre_fuel_'
+    property_tables_root = '../../twod_axi_coupled/data5/newt_msre_fuel_'
+#    property_tables_root = '../input-data/cyl_nt_test/data3/cyl_fuel_'
     interp_type = 'spline'
     block = 'fuel'
     prop_names = 'k cp'     # conductivity, capacity
-    prop_values = '.01014 1752'   # W cm-1 K-1, J kg-1 K-1
+    prop_values = '.01014 1355'   # W cm-1 K-1, J kg-1 K-1
   [../]
   [./rho_fuel]
     type = DerivativeParsedMaterial
@@ -226,7 +234,7 @@ diri_temp=1030    # dirichlet BC temp
 
 [Executioner]
   type = Transient
-  end_time = 1e-3 #1000000
+  end_time = 1000
 
   nl_rel_tol = 1e-6
   nl_abs_tol = 1e-6
@@ -303,7 +311,7 @@ diri_temp=1030    # dirichlet BC temp
   print_linear_residuals = true
   [./exodus]
     type = Exodus
-    file_base = 'cyl'
-    execute_on = 'final'
+    file_base = 'cyly'
+    execute_on = 'timestep_end'
   [../]
 []

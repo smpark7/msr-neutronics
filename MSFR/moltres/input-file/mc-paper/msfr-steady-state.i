@@ -1,17 +1,20 @@
-flow_velocity=120 # cm/s
-# nt_scale=1e13     # neutron flux scaling factor
-ini_temp=930     # initial temp
-diri_temp=900    # dirichlet BC temp
+flow_velocity=.01 # cm/s
+nt_scale=1e5     # neutron flux scaling factor
+ini_temp=923     # initial temp
+diri_temp=923    # dirichlet BC temp
+struc_diri_temp=1050
 
 [GlobalParams]
   num_groups = 6
-  num_precursor_groups = 0
+  num_precursor_groups = 8
   temperature = temp
   group_fluxes = 'group1 group2 group3 group4 group5 group6'
-  power = 10  # MW
+  pre_concs = 'pre1 pre2 pre3 pre4 pre5 pre6 pre7 pre8'
+  power = 650  # MW
   use_exp_form = false
   sss2_input = true
-  account_delayed = false
+  account_delayed = true
+  # eigen = true
 []
 
 [Mesh]
@@ -22,37 +25,55 @@ diri_temp=900    # dirichlet BC temp
   [./group1]
     order = FIRST
     family = LAGRANGE
-    # scaling = 1e6
+    scaling = ${nt_scale}
   [../]
   [./group2]
     order = FIRST
     family = LAGRANGE
-    # scaling = 1e6
+    scaling = ${nt_scale}
   [../]
   [./group3]
     order = FIRST
     family = LAGRANGE
-    # scaling = 1e6
+    scaling = ${nt_scale}
   [../]
   [./group4]
     order = FIRST
     family = LAGRANGE
-    # scaling = 1e6
+    scaling = ${nt_scale}
   [../]
   [./group5]
     order = FIRST
     family = LAGRANGE
-    # scaling = 1e6
+    scaling = ${nt_scale}
   [../]
   [./group6]
     order = FIRST
     family = LAGRANGE
-    # scaling = 1e6
+    scaling = ${nt_scale}
   [../]
   [./temp]
     order = FIRST
     family = LAGRANGE
-    # scaling = 1e-4
+    scaling = 1e-9
+  [../]
+[]
+
+[Precursors]
+  [./pres]
+    var_name_base = pre
+    block = 'fuel'
+    outlet_boundaries = 'fuel_top'
+    prec_scale = 1
+    constant_velocity_values = true
+    u_def = 0
+    v_def = ${flow_velocity}
+    w_def = 0
+    nt_exp_form = false
+    family = MONOMIAL
+    order = CONSTANT
+    transient = false
+    # jac_test = true
   [../]
 []
 
@@ -88,6 +109,7 @@ diri_temp=900    # dirichlet BC temp
     variable = group6
     group_number = 6
   [../]
+
   [./sigma_r_group1]
     type = SigmaR
     variable = group1
@@ -118,6 +140,7 @@ diri_temp=900    # dirichlet BC temp
     variable = group6
     group_number = 6
   [../]
+
   [./inscatter_group1]
     type = InScatter
     variable = group1
@@ -160,6 +183,7 @@ diri_temp=900    # dirichlet BC temp
     num_groups = 6
     group_fluxes = 'group1 group2 group3 group4 group5 group6'
   [../]
+
   [./fission_source_group1]
     type = CoupledFissionEigenKernel
     variable = group1
@@ -203,6 +227,43 @@ diri_temp=900    # dirichlet BC temp
     group_fluxes = 'group1 group2 group3 group4 group5 group6'
   [../]
 
+  [./delayed_group1]
+    type = DelayedNeutronEigenSource
+    variable = group1
+    group_number = 1
+    block = 'fuel'
+  [../]
+  [./delayed_group2]
+    type = DelayedNeutronEigenSource
+    variable = group2
+    group_number = 2
+    block = 'fuel'
+  [../]
+  [./delayed_group3]
+    type = DelayedNeutronEigenSource
+    variable = group3
+    group_number = 3
+    block = 'fuel'
+  [../]
+  [./delayed_group4]
+    type = DelayedNeutronEigenSource
+    variable = group4
+    group_number = 4
+    block = 'fuel'
+  [../]
+  [./delayed_group5]
+    type = DelayedNeutronEigenSource
+    variable = group5
+    group_number = 5
+    block = 'fuel'
+  [../]
+  [./delayed_group6]
+    type = DelayedNeutronEigenSource
+    variable = group6
+    group_number = 6
+    block = 'fuel'
+  [../]
+
   # Temperature
   [./temp_cond]
     type = MatDiffusion
@@ -221,6 +282,7 @@ diri_temp=900    # dirichlet BC temp
     velocity = '0 ${flow_velocity} 0'
     variable = temp
     block = 'fuel'
+    upwinding_type = none
   [../]
 []
 
@@ -324,13 +386,13 @@ diri_temp=900    # dirichlet BC temp
     value = ${diri_temp}
     save_in = 'bc_resid tot_resid'
   [../]
-  [./temp_top]
-    boundary = 'fuel_top struc_bottom'
-    type = DirichletBC
-    variable = temp
-    value = ${diri_temp}
-    save_in = 'bc_resid tot_resid'
-  [../]
+  # [./temp_top]
+  #   boundary = 'struc_top'
+  #   type = DirichletBC
+  #   variable = temp
+  #   value = ${struc_diri_temp}
+  #   save_in = 'bc_resid tot_resid'
+  # [../]
   [./temp_outer]
     boundary = 'outer'
     type = DirichletBC
@@ -338,12 +400,21 @@ diri_temp=900    # dirichlet BC temp
     variable = temp
     save_in = 'bc_resid tot_resid'
   [../]
-#   [./temp_advection_outlet]
-#     boundary = 'top'
-#     type = TemperatureOutflowBC
-#     variable = temp
-#     velocity = '0 ${flow_velocity} 0'
-#   [../]
+  # [./temp_advection_inlet]
+  #   boundary = 'fuel_bottom'
+  #   type = TemperatureInflowBC
+  #   variable = temp
+  #   uu = '0'
+  #   vv = ${flow_velocity}
+  #   ww = '0'
+  #   inlet_conc = ${diri_temp}
+  # [../]
+  [./temp_advection_outlet]
+    boundary = 'fuel_top'
+    type = TemperatureOutflowBC
+    variable = temp
+    velocity = '0 ${flow_velocity} 0'
+  [../]
   [./vacuum_group1]
     type = VacuumConcBC
     boundary = 'fuel_bottom struc_bottom fuel_top struc_top outer'
@@ -377,24 +448,24 @@ diri_temp=900    # dirichlet BC temp
 []
 
 [Executioner]
-  type = NonlinearEigen
-  free_power_iterations = 4
-  # source_abs_tol = 1e-12
-  # source_rel_tol = 1e-8
-  output_after_power_iterations = true
+  # type = NonlinearEigen
+  # free_power_iterations = 8
+  # # source_abs_tol = 1e-12
+  # # source_rel_tol = 1e-8
+  # output_after_power_iterations = true
 
 
-  # type = InversePowerMethod
-  # max_power_iterations = 100
-  # xdiff = 'group1diff'
+  type = InversePowerMethod
+  max_power_iterations = 100
+  xdiff = 'group1diff'
 
   bx_norm = 'bnorm'
   k0 = 1.0
   pfactor = 1e-2
-  l_max_its = 200
+  # l_max_its = 200
   Chebyshev_acceleration_on = True
-  eig_check_tol = 1e-10
-  sol_check_tol = 1e-10
+  # eig_check_tol = 1e-10
+  # sol_check_tol = 1e-10
 
   solve_type = 'PJFNK'
   # solve_type = 'NEWTON'
@@ -469,6 +540,7 @@ diri_temp=900    # dirichlet BC temp
 []
 
 [Outputs]
+  perf_graph = true
   [./out]
     type = Exodus
     execute_on = 'timestep_end'

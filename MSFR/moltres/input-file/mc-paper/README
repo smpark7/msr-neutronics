@@ -1,0 +1,14 @@
+Chronology of input files:
+msfr-steady-state.i             # Eigen solver
+msfr-steady-state-nt.i          # NtAction
+msfr-transient.i                # Transient solver
+msfr-fuel-blanket.i             # Transient solver with new mesh
+msfr-fuel-blanket-boussinesq.i  # Transient solver with Boussinesq approx in blanket (doesn't work)
+msfr-prec-loop.i & sub.i        # Transient solver with precursor loop
+
+Chronology of mesh files:
+mc-paper-mesh.msh
+mc-paper-mesh.e
+fuel-blanket.e
+fuel-blanket-fine.e
+

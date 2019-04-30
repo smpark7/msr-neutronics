@@ -1,26 +1,26 @@
-flow_velocity=0.00112 # cm/s
-# pre_flow_velocity=0.0
+flow_velocity=112.75 # cm/s
+pre_flow_velocity=112.75
 nt_scale=1e-15     # neutron flux scaling factor
+pre_scale=1e-4    # precursor scaling factor
 ini_temp=973     # initial temp
 diri_temp=973    # dirichlet BC temp
-struc_diri_temp=1050
-ini_neut=1e15
+ini_neut=1e14
 
 [GlobalParams]
   num_groups = 6
   num_precursor_groups = 8
   temperature = temp
   group_fluxes = 'group1 group2 group3 group4 group5 group6'
-  # pre_concs = 'pre1 pre2 pre3 pre4 pre5 pre6 pre7 pre8'
+  pre_concs = 'pre1 pre2 pre3 pre4 pre5 pre6 pre7 pre8'
   use_exp_form = false
   sss2_input = true
-  account_delayed = false
+  account_delayed = true
   # alpha = 1
   # eigen = true
 []
 
 [Mesh]
-  file = 'mc-paper-mesh.msh'
+  file = 'fuel-blanket-fine.e'
 [../]
 
 [Problem]
@@ -67,23 +67,28 @@ ini_neut=1e15
   [../]
 []
 
-# [Precursors]
-#   [./pres]
-#     var_name_base = pre
-#     block = 'fuel'
-#     outlet_boundaries = 'fuel_top'
-#     # prec_scale = 1
-#     constant_velocity_values = true
-#     u_def = 0
-#     v_def = ${pre_flow_velocity}
-#     w_def = 0
-#     nt_exp_form = false
-#     family = MONOMIAL
-#     order = CONSTANT
-#     transient = true
-#     # jac_test = true
-#   [../]
-# []
+[Precursors]
+  [./pres]
+    var_name_base = pre
+    block = 'fuel'
+    outlet_boundaries = 'fuel_top'
+    # prec_scale = 1
+    constant_velocity_values = true
+    u_def = 0
+    v_def = ${pre_flow_velocity}
+    w_def = 0
+    nt_exp_form = false
+    family = MONOMIAL
+    order = CONSTANT
+    transient = true
+    loop_precs = true
+    multi_app = loopApp
+    is_loopapp = false
+    inlet_boundaries = 'fuel_bottom'
+    scaling = ${pre_scale}
+    # jac_test = true
+  [../]
+[]
 
 [Kernels]
   # Neutronics
@@ -242,42 +247,42 @@ ini_neut=1e15
     group_number = 6
   [../]
 
-  # [./delayed_group1]
-  #   type = DelayedNeutronSource
-  #   variable = group1
-  #   group_number = 1
-  #   block = 'fuel'
-  # [../]
-  # [./delayed_group2]
-  #   type = DelayedNeutronSource
-  #   variable = group2
-  #   group_number = 2
-  #   block = 'fuel'
-  # [../]
-  # [./delayed_group3]
-  #   type = DelayedNeutronSource
-  #   variable = group3
-  #   group_number = 3
-  #   block = 'fuel'
-  # [../]
-  # [./delayed_group4]
-  #   type = DelayedNeutronSource
-  #   variable = group4
-  #   group_number = 4
-  #   block = 'fuel'
-  # [../]
-  # [./delayed_group5]
-  #   type = DelayedNeutronSource
-  #   variable = group5
-  #   group_number = 5
-  #   block = 'fuel'
-  # [../]
-  # [./delayed_group6]
-  #   type = DelayedNeutronSource
-  #   variable = group6
-  #   group_number = 6
-  #   block = 'fuel'
-  # [../]
+  [./delayed_group1]
+    type = DelayedNeutronSource
+    variable = group1
+    group_number = 1
+    block = 'fuel'
+  [../]
+  [./delayed_group2]
+    type = DelayedNeutronSource
+    variable = group2
+    group_number = 2
+    block = 'fuel'
+  [../]
+  [./delayed_group3]
+    type = DelayedNeutronSource
+    variable = group3
+    group_number = 3
+    block = 'fuel'
+  [../]
+  [./delayed_group4]
+    type = DelayedNeutronSource
+    variable = group4
+    group_number = 4
+    block = 'fuel'
+  [../]
+  [./delayed_group5]
+    type = DelayedNeutronSource
+    variable = group5
+    group_number = 5
+    block = 'fuel'
+  [../]
+  [./delayed_group6]
+    type = DelayedNeutronSource
+    variable = group6
+    group_number = 6
+    block = 'fuel'
+  [../]
 
   # Temperature
   [./temp_time_derivative]
@@ -357,33 +362,33 @@ ini_neut=1e15
     args = 'temp'
     block = 'blanket'
   [../]
-  [./struc]
-    type = GenericMoltresMaterial
-    property_tables_root = '../../input-data/mc-paper/xs-data/data/mc_paper_struc_'
-    interp_type = 'spline'
-    block = 'struc'
-    prop_names = 'k cp'     # conductivity, capacity
-    prop_values = '.25 560'   # W cm-1 K-1, J kg-1 K-1
-  [../]
-  [./rho_struc]
-    type = ParsedMaterial
-    f_name = rho
-    function = '.01'
-    args = 'temp'
-    block = 'struc'
-  [../]
-  [./drho_struc]
-    type = ParsedMaterial
-    f_name = 'drho/dtemp'
-    function = '0'
-    args = 'temp'
-    block = 'struc'
-  [../]
+  # [./struc]
+  #   type = GenericMoltresMaterial
+  #   property_tables_root = '../../input-data/mc-paper/xs-data/data/mc_paper_struc_'
+  #   interp_type = 'spline'
+  #   block = 'struc'
+  #   prop_names = 'k cp'     # conductivity, capacity
+  #   prop_values = '.25 560'   # W cm-1 K-1, J kg-1 K-1
+  # [../]
+  # [./rho_struc]
+  #   type = ParsedMaterial
+  #   f_name = rho
+  #   function = '.01'
+  #   args = 'temp'
+  #   block = 'struc'
+  # [../]
+  # [./drho_struc]
+  #   type = ParsedMaterial
+  #   f_name = 'drho/dtemp'
+  #   function = '0'
+  #   args = 'temp'
+  #   block = 'struc'
+  # [../]
 []
 
 [BCs]
   [./temp]
-    boundary = 'fuel_bottom struc_bottom'
+    boundary = 'fuel_bottom blanket_bottom'
     type = DirichletBC
     variable = temp
     value = ${diri_temp}
@@ -417,64 +422,39 @@ ini_neut=1e15
   [../]
   [./vacuum_group1]
     type = VacuumConcBC
-    boundary = 'fuel_bottom struc_bottom fuel_top struc_top outer'
+    boundary = 'fuel_bottom blanket_bottom fuel_top blanket_top outer'
     variable = group1
   [../]
   [./vacuum_group2]
     type = VacuumConcBC
-    boundary = 'fuel_bottom struc_bottom fuel_top struc_top outer'
+    boundary = 'fuel_bottom blanket_bottom fuel_top blanket_top outer'
     variable = group2
   [../]
   [./vacuum_group3]
     type = VacuumConcBC
-    boundary = 'fuel_bottom struc_bottom fuel_top struc_top outer'
+    boundary = 'fuel_bottom blanket_bottom fuel_top blanket_top outer'
     variable = group3
   [../]
   [./vacuum_group4]
     type = VacuumConcBC
-    boundary = 'fuel_bottom struc_bottom fuel_top struc_top outer'
+    boundary = 'fuel_bottom blanket_bottom fuel_top blanket_top outer'
     variable = group4
   [../]
   [./vacuum_group5]
     type = VacuumConcBC
-    boundary = 'fuel_bottom struc_bottom fuel_top struc_top outer'
+    boundary = 'fuel_bottom blanket_bottom fuel_top blanket_top outer'
     variable = group5
   [../]
   [./vacuum_group6]
     type = VacuumConcBC
-    boundary = 'fuel_bottom struc_bottom fuel_top struc_top outer'
+    boundary = 'fuel_bottom blanket_bottom fuel_top blanket_top outer'
     variable = group6
   [../]
 []
 
 [Executioner]
-  # type = NonlinearEigen
-  # free_power_iterations = 8
-  # # source_abs_tol = 1e-12
-  # # source_rel_tol = 1e-8
-  # output_after_power_iterations = true
-
-
-#   type = InversePowerMethod
-#   max_power_iterations = 100
-#   xdiff = 'group1diff'
-
-#   bx_norm = 'bnorm'
-#   k0 = 1.0
-#   pfactor = 1e-2
-#   # l_max_its = 200
-#   Chebyshev_acceleration_on = True
-#   # eig_check_tol = 1e-10
-#   # sol_check_tol = 1e-10
-
-#   solve_type = 'PJFNK'
-#   # solve_type = 'NEWTON'
-#   petsc_options = '-snes_converged_reason -ksp_converged_reason -snes_linesearch_monitor'
-#   # petsc_options_iname = '-pc_type -sub_pc_type'
-#   # petsc_options_value = 'asm lu'
-
   type = Transient
-  end_time = 1e-3
+  end_time = 100
 
   nl_rel_tol = 1e-6
   nl_abs_tol = 1e-6
@@ -496,9 +476,9 @@ ini_neut=1e15
   [./TimeStepper]
     type = IterationAdaptiveDT
     dt = 1e-6
-    cutback_factor = 1
-    growth_factor = 1
-    optimal_iterations = 20
+    cutback_factor = .5
+    growth_factor = 1.2
+    optimal_iterations = 25
   [../]
 []
 
@@ -557,18 +537,39 @@ ini_neut=1e15
     block = 'fuel'
     outputs = 'exodus console'
   [../]
+  [./heat_fuel]
+    type = ElmIntegTotFissHeatPostprocessor
+    block = 'fuel'
+    outputs = 'exodus'
+  [../]
+  [./heat_blanket]
+    type = ElmIntegTotFissHeatPostprocessor
+    block = 'blanket'
+    outputs = 'exodus'
+  [../]
 []
 
 [Outputs]
   perf_graph = true
+  csv = true
   [./exodus]
     type = Exodus
-    execute_on = 'final'
+    execute_on = 'timestep_end'
   [../]
 []
 
 [Debug]
   show_var_residual_norms = true
+[]
+
+[MultiApps]
+  [./loopApp]
+    type = TransientMultiApp
+    app_type = MoltresApp
+    execute_on = timestep_begin
+    positions = '200.0 200.0 0.0'
+    input_files = 'sub.i'
+  [../]
 []
 
 [ICs]

@@ -1,27 +1,36 @@
-flow_velocity=0.00112 # cm/s
-# pre_flow_velocity=0.0
+flow_velocity=112 # cm/s
+pre_flow_velocity=112
 nt_scale=1e-15     # neutron flux scaling factor
 ini_temp=973     # initial temp
 diri_temp=973    # dirichlet BC temp
 struc_diri_temp=1050
-ini_neut=1e15
+ini_neut=1e14
 
 [GlobalParams]
   num_groups = 6
   num_precursor_groups = 8
   temperature = temp
   group_fluxes = 'group1 group2 group3 group4 group5 group6'
-  # pre_concs = 'pre1 pre2 pre3 pre4 pre5 pre6 pre7 pre8'
+  pre_concs = 'pre1 pre2 pre3 pre4 pre5 pre6 pre7 pre8'
   use_exp_form = false
   sss2_input = true
-  account_delayed = false
+  account_delayed = true
+  gravity = '0 -981 0'
   # alpha = 1
   # eigen = true
 []
 
 [Mesh]
-  file = 'mc-paper-mesh.msh'
+  file = 'fuel-blanket-boussinesq.e'
 [../]
+
+[MeshModifiers]
+  [./bottom_left]
+    type = AddExtraNodeset
+    new_boundary = corner
+    coord = '0 0'
+  [../]
+[]
 
 [Problem]
   type = FEProblem
@@ -61,29 +70,46 @@ ini_neut=1e15
     scaling = ${nt_scale}
   [../]
   [./temp]
-    order = FIRST
+    order = SECOND
     family = LAGRANGE
     scaling = 1e-6
   [../]
+  [./ux]
+    family = LAGRANGE
+    order = SECOND
+  [../]
+  [./uy]
+    family = LAGRANGE
+    order = SECOND
+    scaling = 1e-3
+  [../]
+  [./uz]
+    family = LAGRANGE
+    order = SECOND
+  [../]
+  [./p]
+    family = LAGRANGE
+    order = FIRST
+  [../]
 []
 
-# [Precursors]
-#   [./pres]
-#     var_name_base = pre
-#     block = 'fuel'
-#     outlet_boundaries = 'fuel_top'
-#     # prec_scale = 1
-#     constant_velocity_values = true
-#     u_def = 0
-#     v_def = ${pre_flow_velocity}
-#     w_def = 0
-#     nt_exp_form = false
-#     family = MONOMIAL
-#     order = CONSTANT
-#     transient = true
-#     # jac_test = true
-#   [../]
-# []
+[Precursors]
+  [./pres]
+    var_name_base = pre
+    block = 'fuel'
+    outlet_boundaries = 'fuel_top'
+    # prec_scale = 1
+    constant_velocity_values = true
+    u_def = 0
+    v_def = ${pre_flow_velocity}
+    w_def = 0
+    nt_exp_form = false
+    family = MONOMIAL
+    order = CONSTANT
+    transient = true
+    # jac_test = true
+  [../]
+[]
 
 [Kernels]
   # Neutronics
@@ -242,42 +268,42 @@ ini_neut=1e15
     group_number = 6
   [../]
 
-  # [./delayed_group1]
-  #   type = DelayedNeutronSource
-  #   variable = group1
-  #   group_number = 1
-  #   block = 'fuel'
-  # [../]
-  # [./delayed_group2]
-  #   type = DelayedNeutronSource
-  #   variable = group2
-  #   group_number = 2
-  #   block = 'fuel'
-  # [../]
-  # [./delayed_group3]
-  #   type = DelayedNeutronSource
-  #   variable = group3
-  #   group_number = 3
-  #   block = 'fuel'
-  # [../]
-  # [./delayed_group4]
-  #   type = DelayedNeutronSource
-  #   variable = group4
-  #   group_number = 4
-  #   block = 'fuel'
-  # [../]
-  # [./delayed_group5]
-  #   type = DelayedNeutronSource
-  #   variable = group5
-  #   group_number = 5
-  #   block = 'fuel'
-  # [../]
-  # [./delayed_group6]
-  #   type = DelayedNeutronSource
-  #   variable = group6
-  #   group_number = 6
-  #   block = 'fuel'
-  # [../]
+  [./delayed_group1]
+    type = DelayedNeutronSource
+    variable = group1
+    group_number = 1
+    block = 'fuel'
+  [../]
+  [./delayed_group2]
+    type = DelayedNeutronSource
+    variable = group2
+    group_number = 2
+    block = 'fuel'
+  [../]
+  [./delayed_group3]
+    type = DelayedNeutronSource
+    variable = group3
+    group_number = 3
+    block = 'fuel'
+  [../]
+  [./delayed_group4]
+    type = DelayedNeutronSource
+    variable = group4
+    group_number = 4
+    block = 'fuel'
+  [../]
+  [./delayed_group5]
+    type = DelayedNeutronSource
+    variable = group5
+    group_number = 5
+    block = 'fuel'
+  [../]
+  [./delayed_group6]
+    type = DelayedNeutronSource
+    variable = group6
+    group_number = 6
+    block = 'fuel'
+  [../]
 
   # Temperature
   [./temp_time_derivative]
@@ -288,6 +314,7 @@ ini_neut=1e15
     type = MatDiffusion
     variable = temp
     D_name = 'k'
+    block = 'fuel'
   [../]
   [./temp_source]
     type = TransientFissionHeatSource
@@ -299,6 +326,94 @@ ini_neut=1e15
     velocity = '0 ${flow_velocity} 0'
     variable = temp
     block = 'fuel'
+  [../]
+
+  # Boussinesq
+  [./mass]
+    type = INSMass
+    variable = p
+    u = ux
+    v = uy
+    w = uz
+    p = p
+    block = 'blanket'
+  [../]
+  [./x_time_deriv]
+    type = INSMomentumTimeDerivative
+    variable = ux
+    block = 'blanket'
+  [../]
+  [./y_time_deriv]
+    type = INSMomentumTimeDerivative
+    variable = uy
+    block = 'blanket'
+  [../]
+  [./z_time_deriv]
+    type = INSMomentumTimeDerivative
+    variable = uz
+    block = 'blanket'
+  [../]
+  [./x_momentum_space]
+    type = INSMomentumLaplaceForm
+    variable = ux
+    u = ux
+    v = uy
+    w = uz
+    p = p
+    component = 0
+    block = 'blanket'
+  [../]
+  [./y_momentum_space]
+    type = INSMomentumLaplaceForm
+    variable = uy
+    u = ux
+    v = uy
+    w = uz
+    p = p
+    component = 1
+    block = 'blanket'
+  [../]
+  [./z_momentum_space]
+    type = INSMomentumLaplaceForm
+    variable = uz
+    u = ux
+    v = uy
+    w = uz
+    p = p
+    component = 2
+    block = 'blanket'
+  [../]
+  [./tempAdvectionDiffusion]
+    type = INSTemperature
+    variable = temp
+    u = ux
+    v = uy
+    w = uz
+    block = 'blanket'
+  [../]
+  [./buoyancy_x]
+    type = INSBoussinesqBodyForce
+    variable = ux
+    dT = deltaT
+    component = 0
+    temperature = temp
+    block = 'blanket'
+  [../]
+  [./buoyancy_y]
+    type = INSBoussinesqBodyForce
+    variable = uy
+    dT = deltaT
+    component = 1
+    temperature = temp
+    block = 'blanket'
+  [../]
+  [./buoyancy_z]
+    type = INSBoussinesqBodyForce
+    variable = uz
+    dT = deltaT
+    component = 2
+    temperature = temp
+    block = 'blanket'
   [../]
 []
 
@@ -338,8 +453,8 @@ ini_neut=1e15
     type = GenericMoltresMaterial
     property_tables_root = '../../input-data/mc-paper/xs-data/data/mc_paper_blanket_'
     interp_type = 'spline'
-    prop_names = 'cp'
-    prop_values = '1355'
+    prop_names = 'cp alpha temp_ref'
+    prop_values = '1355 0 0'
     block = 'blanket'
   [../]
   [./rho_blanket]
@@ -357,33 +472,41 @@ ini_neut=1e15
     args = 'temp'
     block = 'blanket'
   [../]
-  [./struc]
-    type = GenericMoltresMaterial
-    property_tables_root = '../../input-data/mc-paper/xs-data/data/mc_paper_struc_'
-    interp_type = 'spline'
-    block = 'struc'
-    prop_names = 'k cp'     # conductivity, capacity
-    prop_values = '.25 560'   # W cm-1 K-1, J kg-1 K-1
-  [../]
-  [./rho_struc]
+  [./mu_blanket]
     type = ParsedMaterial
-    f_name = rho
-    function = '.01'
+    f_name = mu
+    function = 'rho * exp(3689 / temp) * 5.55e-8 * 10000'
+    material_property_names = 'rho'
     args = 'temp'
-    block = 'struc'
+    block = 'blanket'
   [../]
-  [./drho_struc]
-    type = ParsedMaterial
-    f_name = 'drho/dtemp'
-    function = '0'
-    args = 'temp'
-    block = 'struc'
-  [../]
+  # [./struc]
+  #   type = GenericMoltresMaterial
+  #   property_tables_root = '../../input-data/mc-paper/xs-data/data/mc_paper_struc_'
+  #   interp_type = 'spline'
+  #   block = 'struc'
+  #   prop_names = 'k cp'     # conductivity, capacity
+  #   prop_values = '.25 560'   # W cm-1 K-1, J kg-1 K-1
+  # [../]
+  # [./rho_struc]
+  #   type = ParsedMaterial
+  #   f_name = rho
+  #   function = '.01'
+  #   args = 'temp'
+  #   block = 'struc'
+  # [../]
+  # [./drho_struc]
+  #   type = ParsedMaterial
+  #   f_name = 'drho/dtemp'
+  #   function = '0'
+  #   args = 'temp'
+  #   block = 'struc'
+  # [../]
 []
 
 [BCs]
   [./temp]
-    boundary = 'fuel_bottom struc_bottom'
+    boundary = 'fuel_bottom blanket_bottom'
     type = DirichletBC
     variable = temp
     value = ${diri_temp}
@@ -417,33 +540,57 @@ ini_neut=1e15
   [../]
   [./vacuum_group1]
     type = VacuumConcBC
-    boundary = 'fuel_bottom struc_bottom fuel_top struc_top outer'
+    boundary = 'fuel_bottom blanket_bottom fuel_top blanket_top outer'
     variable = group1
   [../]
   [./vacuum_group2]
     type = VacuumConcBC
-    boundary = 'fuel_bottom struc_bottom fuel_top struc_top outer'
+    boundary = 'fuel_bottom blanket_bottom fuel_top blanket_top outer'
     variable = group2
   [../]
   [./vacuum_group3]
     type = VacuumConcBC
-    boundary = 'fuel_bottom struc_bottom fuel_top struc_top outer'
+    boundary = 'fuel_bottom blanket_bottom fuel_top blanket_top outer'
     variable = group3
   [../]
   [./vacuum_group4]
     type = VacuumConcBC
-    boundary = 'fuel_bottom struc_bottom fuel_top struc_top outer'
+    boundary = 'fuel_bottom blanket_bottom fuel_top blanket_top outer'
     variable = group4
   [../]
   [./vacuum_group5]
     type = VacuumConcBC
-    boundary = 'fuel_bottom struc_bottom fuel_top struc_top outer'
+    boundary = 'fuel_bottom blanket_bottom fuel_top blanket_top outer'
     variable = group5
   [../]
   [./vacuum_group6]
     type = VacuumConcBC
-    boundary = 'fuel_bottom struc_bottom fuel_top struc_top outer'
+    boundary = 'fuel_bottom blanket_bottom fuel_top blanket_top outer'
     variable = group6
+  [../]
+  [./ux_dirichlet]
+    type = DirichletBC
+    boundary = 'blanket_top blanket_bottom inner outer'
+    variable = ux
+    value = 0
+  [../]
+  [./uy_dirichlet]
+    type = DirichletBC
+    boundary = 'blanket_top blanket_bottom inner outer'
+    variable = uy
+    value = 0
+  [../]
+  [./uz_dirichlet]
+    type = DirichletBC
+    boundary = 'blanket_top blanket_bottom inner outer'
+    variable = uz
+    value = 0
+  [../]
+  [./p_zero]
+    type = DirichletBC
+    boundary = corner
+    variable = p
+    value = 0
   [../]
 []
 
@@ -474,7 +621,7 @@ ini_neut=1e15
 #   # petsc_options_value = 'asm lu'
 
   type = Transient
-  end_time = 1e-3
+  end_time = 10000
 
   nl_rel_tol = 1e-6
   nl_abs_tol = 1e-6
@@ -496,8 +643,8 @@ ini_neut=1e15
   [./TimeStepper]
     type = IterationAdaptiveDT
     dt = 1e-6
-    cutback_factor = 1
-    growth_factor = 1
+    cutback_factor = .5
+    growth_factor = 1.2
     optimal_iterations = 20
   [../]
 []
@@ -606,5 +753,20 @@ ini_neut=1e15
     type = ConstantIC
     variable = group6
     value = ${ini_neut}
+  [../]
+  [./ux_ic]
+    type = ConstantIC
+    variable = ux
+    value = 0
+  [../]
+  [./uy_ic]
+    type = ConstantIC
+    variable = uy
+    value = 0
+  [../]
+  [./uz_ic]
+    type = ConstantIC
+    variable = uz
+    value = 0
   [../]
 []

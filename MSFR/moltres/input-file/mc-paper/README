@@ -10,5 +10,6 @@ Chronology of mesh files:
 mc-paper-mesh.msh
 mc-paper-mesh.e
 fuel-blanket.e
+fuel-blanket-boussinesq.e       # QUAD9 elements
 fuel-blanket-fine.e
 

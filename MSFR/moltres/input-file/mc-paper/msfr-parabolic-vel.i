@@ -63,7 +63,7 @@ ini_neut=1e14
   [./temp]
     order = FIRST
     family = LAGRANGE
-    scaling = 1
+    scaling = 1e-6
   [../]
 []
 
@@ -299,11 +299,45 @@ ini_neut=1e14
     nt_scale=1
     variable = temp
   [../]
+  # [./temp_advection_fuel]
+  #   type = ConservativeTemperatureAdvection
+  #   velocity = '0 ${flow_velocity} 0'
+  #   variable = temp
+  #   block = 'fuel'
+  # [../]
   [./temp_advection_fuel]
-    type = ConservativeTemperatureAdvection
-    velocity = '0 ${flow_velocity} 0'
+    type = CtrlConservativeTemperatureAdvection
+    u_val = 0
+    v_val = ${flow_velocity} # this will be changed in ctrls block
+    w_val = 0
     variable = temp
     block = 'fuel'
+  [../]
+[]
+
+[Functions]
+  [./velFunc]
+    type = ParsedFunction
+    value = '(2 / 112.75 / 10) * (112.75 ^ 2 - (x ^ 2)) + 101.475'
+  [../]
+  [./nullFunc]
+    type = ParsedFunction
+    value = '0'
+  [../]
+[]
+
+[Controls]
+  [./flowControl]
+    type = RealFunctionControl
+    parameter = '*/*/v_val'
+    function = velFunc
+    execute_on = 'initial timestep_begin'
+  [../]
+  [./flowControl2]
+    type = RealFunctionControl
+    parameter = '*/*/vv'
+    function = velFunc
+    execute_on = 'initial timestep_begin'
   [../]
 []
 
@@ -414,11 +448,19 @@ ini_neut=1e14
   #   ww = '0'
   #   inlet_conc = ${diri_temp}
   # [../]
+  # [./temp_advection_outlet]
+  #   boundary = 'fuel_top'
+  #   type = TemperatureOutflowBC
+  #   variable = temp
+  #   velocity = '0 ${flow_velocity} 0'
+  # [../]
   [./temp_advection_outlet]
     boundary = 'fuel_top'
-    type = TemperatureOutflowBC
+    type = VelocityFunctionTemperatureOutflowBC
     variable = temp
-    velocity = '0 ${flow_velocity} 0'
+    vel_x_func = nullFunc
+    vel_y_func = velFunc
+    vel_z_func = nullFunc
   [../]
   [./vacuum_group1]
     type = VacuumConcBC
@@ -484,7 +526,7 @@ ini_neut=1e14
 
 [Preconditioning]
   [./FDP]
-    type = SMP
+    type = FDP
     full = true
   [../]
 []
@@ -537,13 +579,6 @@ ini_neut=1e14
     block = 'fuel'
     outputs = 'exodus console csv'
   [../]
-  [./max_temp_fuel]
-    type = ElementExtremeValue
-    variable = temp
-    block = 'fuel'
-    value_type = 'max'
-    outputs = 'exodus console csv'
-  [../]
   [./temp_blanket]
     type = ElementAverageValue
     variable = temp
@@ -585,7 +620,7 @@ ini_neut=1e14
     app_type = MoltresApp
     execute_on = timestep_begin
     positions = '200.0 200.0 0.0'
-    input_files = 'sub.i'
+    input_files = 'sub-parabolic-vel.i'
   [../]
 []
 

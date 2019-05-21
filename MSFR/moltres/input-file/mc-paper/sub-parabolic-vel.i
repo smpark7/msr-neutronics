@@ -1,5 +1,5 @@
 pre_flow_velocity=112.75
-pre_scale=1e-12    # precursor scaling factor
+pre_scale=1e-4    # precursor scaling factor
 
 [GlobalParams]
   num_groups = 0
@@ -34,6 +34,7 @@ pre_scale=1e-12    # precursor scaling factor
   [./core]
     var_name_base = pre
     outlet_boundaries = 'top'
+    constant_velocity_values = true
     u_def = 0
     v_def = ${pre_flow_velocity}
     w_def = 0
@@ -52,6 +53,26 @@ pre_scale=1e-12    # precursor scaling factor
   [./temp_time_derivative]
     type = MatINSTemperatureTimeDerivative
     variable = temp
+  [../]
+[]
+
+[Functions]
+  [./velFunc]
+    type = ParsedFunction
+    value = '(2 / 112.75 / 10) * (112.75 ^ 2 - (x ^ 2)) + 101.475'
+  [../]
+  [./nullFunc]
+    type = ParsedFunction
+    value = '0'
+  [../]
+[]
+
+[Controls]
+  [./flowControl]
+    type = RealFunctionControl
+    parameter = '*/*/vv'
+    function = velFunc
+    execute_on = 'initial timestep_begin'
   [../]
 []
 
@@ -104,7 +125,7 @@ pre_scale=1e-12    # precursor scaling factor
 
 [Preconditioning]
   [./SMP]
-    type = SMP
+    type = FDP
     full = true
   [../]
 []

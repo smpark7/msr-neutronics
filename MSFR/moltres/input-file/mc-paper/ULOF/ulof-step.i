@@ -1,10 +1,11 @@
-flow_velocity=112.75 # cm/s
-pre_flow_velocity=112.75
-nt_scale=1e-15     # neutron flux scaling factor
-pre_scale=1e-12    # precursor scaling factor
-ini_temp=973     # initial temp
-diri_temp=973    # dirichlet BC temp
-ini_neut=1e14
+flow_velocity=112.75      # cm/s
+pre_flow_velocity=112.75  # cm/s
+nt_scale=1e-15          # neutron flux scaling factor
+pre_scale=1e-4          # precursor scaling factor
+ini_temp=973            # initial temp
+diri_temp=973           # dirichlet BC temp
+ini_neut=1e14           # initial neutron flux
+tau = 5                 # pump coastdown time constant
 
 [GlobalParams]
   num_groups = 6
@@ -20,7 +21,7 @@ ini_neut=1e14
 []
 
 [Mesh]
-  file = 'fuel-blanket-fine.e'
+  file = '../msfr-prec-loop_exodus.e'
 [../]
 
 [Problem]
@@ -34,36 +35,50 @@ ini_neut=1e14
     order = FIRST
     family = LAGRANGE
     scaling = ${nt_scale}
+    initial_from_file_var = group1
+    initial_from_file_timestep = LATEST
   [../]
   [./group2]
     order = FIRST
     family = LAGRANGE
     scaling = ${nt_scale}
+    initial_from_file_var = group2
+    initial_from_file_timestep = LATEST
   [../]
   [./group3]
     order = FIRST
     family = LAGRANGE
     scaling = ${nt_scale}
+    initial_from_file_var = group3
+    initial_from_file_timestep = LATEST
   [../]
   [./group4]
     order = FIRST
     family = LAGRANGE
     scaling = ${nt_scale}
+    initial_from_file_var = group4
+    initial_from_file_timestep = LATEST
   [../]
   [./group5]
     order = FIRST
     family = LAGRANGE
     scaling = ${nt_scale}
+    initial_from_file_var = group5
+    initial_from_file_timestep = LATEST
   [../]
   [./group6]
     order = FIRST
     family = LAGRANGE
     scaling = ${nt_scale}
+    initial_from_file_var = group6
+    initial_from_file_timestep = LATEST
   [../]
   [./temp]
     order = FIRST
     family = LAGRANGE
     scaling = 1
+    initial_from_file_var = temp
+    initial_from_file_timestep = LATEST
   [../]
 []
 
@@ -86,6 +101,7 @@ ini_neut=1e14
     is_loopapp = false
     inlet_boundaries = 'fuel_bottom'
     scaling = ${pre_scale}
+    init_from_file = true
     # jac_test = true
   [../]
 []
@@ -300,17 +316,57 @@ ini_neut=1e14
     variable = temp
   [../]
   [./temp_advection_fuel]
-    type = ConservativeTemperatureAdvection
-    velocity = '0 ${flow_velocity} 0'
+    type = CtrlConservativeTemperatureAdvection
+    u_val = 0
+    v_val = ${flow_velocity} # this will be changed in ctrls block
+    w_val = 0
     variable = temp
     block = 'fuel'
+  [../]
+[]
+
+[Functions]
+  [./velFunc]
+    type = ParsedFunction
+    value = '6.26'
+  [../]
+  [./nullFunc]
+    type = ParsedFunction
+    value = '0'
+  [../]
+[]
+
+[Controls]
+  [./flowControl]
+    type = RealFunctionControl
+    parameter = '*/*/v_val'
+    function = velFunc
+    execute_on = 'initial timestep_begin'
+  [../]
+  [./flowControl2]
+    type = RealFunctionControl
+    parameter = '*/*/uu'
+    function = nullFunc
+    execute_on = 'timestep_begin'
+  [../]
+  [./flowControl3]
+    type = RealFunctionControl
+    parameter = '*/*/vv'
+    function = velFunc
+    execute_on = 'timestep_begin'
+  [../]
+  [./flowControl4]
+    type = RealFunctionControl
+    parameter = '*/*/ww'
+    function = nullFunc
+    execute_on = 'timestep_begin'
   [../]
 []
 
 [Materials]
   [./fuel]
     type = GenericMoltresMaterial
-    property_tables_root = '../../input-data/mc-paper/xs-data/data/mc_paper_fuel_'
+    property_tables_root = '../../../input-data/mc-paper/xs-data/data/mc_paper_fuel_'
     interp_type = 'spline'
     prop_names = 'cp'
     prop_values = '1355'
@@ -327,7 +383,7 @@ ini_neut=1e14
   [./k_fuel]
     type = ParsedMaterial
     f_name = k
-    function = '(0.928 + 8.397e-5 * temp) * .01'
+    function = '(0.928 + temp * 8.397e-5) * .01'
     args = 'temp'
     block = 'fuel'
   [../]
@@ -341,7 +397,7 @@ ini_neut=1e14
   [../]
   [./blanket]
     type = GenericMoltresMaterial
-    property_tables_root = '../../input-data/mc-paper/xs-data/data/mc_paper_blanket_'
+    property_tables_root = '../../../input-data/mc-paper/xs-data/data/mc_paper_blanket_'
     interp_type = 'spline'
     prop_names = 'cp'
     prop_values = '1355'
@@ -364,7 +420,7 @@ ini_neut=1e14
   [../]
   # [./struc]
   #   type = GenericMoltresMaterial
-  #   property_tables_root = '../../input-data/mc-paper/xs-data/data/mc_paper_struc_'
+  #   property_tables_root = '../../../input-data/mc-paper/xs-data/data/mc_paper_struc_'
   #   interp_type = 'spline'
   #   block = 'struc'
   #   prop_names = 'k cp'     # conductivity, capacity
@@ -416,9 +472,11 @@ ini_neut=1e14
   # [../]
   [./temp_advection_outlet]
     boundary = 'fuel_top'
-    type = TemperatureOutflowBC
+    type = VelocityFunctionTemperatureOutflowBC
     variable = temp
-    velocity = '0 ${flow_velocity} 0'
+    vel_x_func = nullFunc
+    vel_y_func = velFunc
+    vel_z_func = nullFunc
   [../]
   [./vacuum_group1]
     type = VacuumConcBC
@@ -454,7 +512,7 @@ ini_neut=1e14
 
 [Executioner]
   type = Transient
-  end_time = 100
+  end_time = 1000
 
   nl_rel_tol = 1e-6
   nl_abs_tol = 1e-6
@@ -585,44 +643,6 @@ ini_neut=1e14
     app_type = MoltresApp
     execute_on = timestep_begin
     positions = '200.0 200.0 0.0'
-    input_files = 'sub.i'
-  [../]
-[]
-
-[ICs]
-  [./temp_ic]
-    type = ConstantIC
-    variable = temp
-    value = ${ini_temp}
-  [../]
-  [./group1_ic]
-    type = ConstantIC
-    variable = group1
-    value = ${ini_neut}
-  [../]
-  [./group2_ic]
-    type = ConstantIC
-    variable = group2
-    value = ${ini_neut}
-  [../]
-  [./group3_ic]
-    type = ConstantIC
-    variable = group3
-    value = ${ini_neut}
-  [../]
-  [./group4_ic]
-    type = ConstantIC
-    variable = group4
-    value = ${ini_neut}
-  [../]
-  [./group5_ic]
-    type = ConstantIC
-    variable = group5
-    value = ${ini_neut}
-  [../]
-  [./group6_ic]
-    type = ConstantIC
-    variable = group6
-    value = ${ini_neut}
+    input_files = 'sub-step.i'
   [../]
 []

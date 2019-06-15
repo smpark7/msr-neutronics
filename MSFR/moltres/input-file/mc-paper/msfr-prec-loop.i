@@ -4,7 +4,7 @@ nt_scale=1e-15     # neutron flux scaling factor
 pre_scale=1e-12    # precursor scaling factor
 ini_temp=973     # initial temp
 diri_temp=973    # dirichlet BC temp
-ini_neut=1e14
+ini_neut=1e12
 
 [GlobalParams]
   num_groups = 6
@@ -63,7 +63,7 @@ ini_neut=1e14
   [./temp]
     order = FIRST
     family = LAGRANGE
-    scaling = 1
+    scaling = 1e-3
   [../]
 []
 
@@ -476,7 +476,7 @@ ini_neut=1e14
   [./TimeStepper]
     type = IterationAdaptiveDT
     dt = 1e-6
-    cutback_factor = .5
+    cutback_factor = .4
     growth_factor = 1.2
     optimal_iterations = 25
   [../]

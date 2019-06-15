@@ -5,10 +5,8 @@ pre_scale=1e-12    # precursor scaling factor
   num_groups = 0
   num_precursor_groups = 8
   temperature = temp
-  use_exp_form = false
   group_fluxes = ''
   sss2_input = true
-  pre_concs = 'pre1 pre2 pre3 pre4 pre5 pre6 pre7 pre8'
   # account_delayed = true
 []
 

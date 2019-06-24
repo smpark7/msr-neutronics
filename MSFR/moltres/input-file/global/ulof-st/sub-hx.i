@@ -1,5 +1,6 @@
 pre_flow_velocity=112.75
-pre_scale=1e-4    # precursor scaling factor
+pre_scale=1e-12    # precursor scaling factor
+tau = 5
 
 [GlobalParams]
   num_groups = 0
@@ -13,28 +14,23 @@ pre_scale=1e-4    # precursor scaling factor
 []
 
 [Mesh]
-  type = GeneratedMesh
-  dim = 2
-  nx = 1
-  ny = 600
-  xmax = 112.75
-  ymax = 188
-  elem_type = QUAD
+  file = '../msfr-hx_out_loopApp0.e'
 [../]
 
 [Variables]
   [./temp]
-    order = FIRST
-    family = LAGRANGE
+    order = CONSTANT
+    family = MONOMIAL
     scaling = 1
+    initial_from_file_var = temp
+    initial_from_file_timestep = LATEST
   [../]
 []
 
 [Precursors]
   [./core]
     var_name_base = pre
-    outlet_boundaries = 'top'
-    constant_velocity_values = true
+    outlet_boundaries = 'right'
     u_def = 0
     v_def = ${pre_flow_velocity}
     w_def = 0
@@ -44,8 +40,9 @@ pre_scale=1e-4    # precursor scaling factor
     loop_precs = true
     multi_app = loopApp
     is_loopapp = true
-    inlet_boundaries = 'bottom'
+    inlet_boundaries = 'left'
     scaling = ${pre_scale}
+    init_from_file = true
   [../]
 []
 
@@ -59,7 +56,7 @@ pre_scale=1e-4    # precursor scaling factor
 [Functions]
   [./velFunc]
     type = ParsedFunction
-    value = '(2 / 112.75 / 10) * (112.75 ^ 2 - (x ^ 2)) + 101.475'
+    value = '(${pre_flow_velocity} - 6.26) * exp(-t / ${tau}) + 6.26'
   [../]
   [./nullFunc]
     type = ParsedFunction
@@ -70,16 +67,28 @@ pre_scale=1e-4    # precursor scaling factor
 [Controls]
   [./flowControl]
     type = RealFunctionControl
+    parameter = '*/*/uu'
+    function = nullFunc
+    execute_on = 'timestep_begin'
+  [../]
+  [./flowControl2]
+    type = RealFunctionControl
     parameter = '*/*/vv'
     function = velFunc
-    execute_on = 'initial timestep_begin'
+    execute_on = 'timestep_begin'
+  [../]
+  [./flowControl3]
+    type = RealFunctionControl
+    parameter = '*/*/ww'
+    function = nullFunc
+    execute_on = 'timestep_begin'
   [../]
 []
 
 [Materials]
   [./fuel]
     type = GenericMoltresMaterial
-    property_tables_root = '../../input-data/mc-paper/xs-data/data/mc_paper_fuel_'
+    property_tables_root = '../../../input-data/mc-paper/xs-data/data/mc_paper_fuel_'
     interp_type = 'spline'
     prop_names = 'cp'
     prop_values = '1355'
@@ -135,8 +144,7 @@ pre_scale=1e-4    # precursor scaling factor
   print_linear_residuals = true
   [./exodus]
     type = Exodus
-    file_base = 'sub'
-    execute_on = 'timestep_begin'
+    execute_on = 'timestep_end'
   [../]
 []
 

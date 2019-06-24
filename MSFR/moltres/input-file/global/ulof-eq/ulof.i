@@ -2,9 +2,10 @@ flow_velocity=112.75 # cm/s
 pre_flow_velocity=112.75
 nt_scale=1e-15     # neutron flux scaling factor
 pre_scale=1e-12    # precursor scaling factor
-ini_temp=973     # initial temp
-diri_temp=973    # dirichlet BC temp
-ini_neut=1e12
+ini_temp=923     # initial temp
+diri_temp=923    # dirichlet BC temp
+ini_neut=1e14
+tau = 5
 
 [GlobalParams]
   num_groups = 6
@@ -20,7 +21,7 @@ ini_neut=1e12
 []
 
 [Mesh]
-  file = 'fuel-blanket-fine.e'
+  file = '../msfr-hx-eq_exodus.e'
 [../]
 
 [Problem]
@@ -34,36 +35,50 @@ ini_neut=1e12
     order = FIRST
     family = LAGRANGE
     scaling = ${nt_scale}
+    initial_from_file_var = group1
+    initial_from_file_timestep = LATEST
   [../]
   [./group2]
     order = FIRST
     family = LAGRANGE
     scaling = ${nt_scale}
+    initial_from_file_var = group2
+    initial_from_file_timestep = LATEST
   [../]
   [./group3]
     order = FIRST
     family = LAGRANGE
     scaling = ${nt_scale}
+    initial_from_file_var = group3
+    initial_from_file_timestep = LATEST
   [../]
   [./group4]
     order = FIRST
     family = LAGRANGE
     scaling = ${nt_scale}
+    initial_from_file_var = group4
+    initial_from_file_timestep = LATEST
   [../]
   [./group5]
     order = FIRST
     family = LAGRANGE
     scaling = ${nt_scale}
+    initial_from_file_var = group5
+    initial_from_file_timestep = LATEST
   [../]
   [./group6]
     order = FIRST
     family = LAGRANGE
     scaling = ${nt_scale}
+    initial_from_file_var = group6
+    initial_from_file_timestep = LATEST
   [../]
   [./temp]
     order = FIRST
     family = LAGRANGE
-    scaling = 1e-6
+    scaling = 1
+    initial_from_file_var = temp
+    initial_from_file_timestep = LATEST
   [../]
 []
 
@@ -86,6 +101,7 @@ ini_neut=1e12
     is_loopapp = false
     inlet_boundaries = 'fuel_bottom'
     scaling = ${pre_scale}
+    init_from_file = true
     # jac_test = true
   [../]
 []
@@ -299,15 +315,8 @@ ini_neut=1e12
     nt_scale=1
     variable = temp
   [../]
-  # [./temp_advection_fuel]
-  #   type = ConservativeTemperatureAdvection
-  #   velocity = '0 ${flow_velocity} 0'
-  #   variable = temp
-  #   block = 'fuel'
-  # [../]
   [./temp_advection_fuel]
     type = CtrlConservativeTemperatureAdvection
-    upwinding_type = full
     u_val = 0
     v_val = ${flow_velocity} # this will be changed in ctrls block
     w_val = 0
@@ -319,7 +328,7 @@ ini_neut=1e12
 [Functions]
   [./velFunc]
     type = ParsedFunction
-    value = '(2 / 112.75 / 10) * (112.75 ^ 2 - (x ^ 2)) + 101.475'
+    value = '(${flow_velocity} - 6.26) * exp(-t / ${tau}) + 6.26'
   [../]
   [./nullFunc]
     type = ParsedFunction
@@ -336,16 +345,28 @@ ini_neut=1e12
   [../]
   [./flowControl2]
     type = RealFunctionControl
+    parameter = '*/*/uu'
+    function = nullFunc
+    execute_on = 'timestep_begin'
+  [../]
+  [./flowControl3]
+    type = RealFunctionControl
     parameter = '*/*/vv'
     function = velFunc
-    execute_on = 'initial timestep_begin'
+    execute_on = 'timestep_begin'
+  [../]
+  [./flowControl4]
+    type = RealFunctionControl
+    parameter = '*/*/ww'
+    function = nullFunc
+    execute_on = 'timestep_begin'
   [../]
 []
 
 [Materials]
   [./fuel]
     type = GenericMoltresMaterial
-    property_tables_root = '../../input-data/mc-paper/xs-data/data/mc_paper_fuel_'
+    property_tables_root = '../../../input-data/mc-paper/xs-data/data-eq/eq_fuel_'
     interp_type = 'spline'
     prop_names = 'cp'
     prop_values = '1355'
@@ -362,7 +383,7 @@ ini_neut=1e12
   [./k_fuel]
     type = ParsedMaterial
     f_name = k
-    function = '(0.928 + 8.397e-5 * temp) * .1'    # original x10
+    function = '(0.928 + 8.397e-5 * temp) * .01'
     args = 'temp'
     block = 'fuel'
   [../]
@@ -376,7 +397,7 @@ ini_neut=1e12
   [../]
   [./blanket]
     type = GenericMoltresMaterial
-    property_tables_root = '../../input-data/mc-paper/xs-data/data/mc_paper_blanket_'
+    property_tables_root = '../../../input-data/mc-paper/xs-data/data-eq/eq_blanket_'
     interp_type = 'spline'
     prop_names = 'cp'
     prop_values = '1355'
@@ -422,11 +443,17 @@ ini_neut=1e12
 []
 
 [BCs]
-  [./temp]
-    boundary = 'fuel_bottom blanket_bottom'
+  [./temp_diri]
+    boundary = 'blanket_bottom'
     type = DirichletBC
     variable = temp
     value = ${diri_temp}
+  [../]
+  [./temp_fuel_bottom]
+    boundary = 'fuel_bottom'
+    type = DirichletBC
+    value = 916.85
+    variable = temp
   [../]
   # [./temp_top]
   #   boundary = 'struc_top'
@@ -448,12 +475,6 @@ ini_neut=1e12
   #   vv = ${flow_velocity}
   #   ww = '0'
   #   inlet_conc = ${diri_temp}
-  # [../]
-  # [./temp_advection_outlet]
-  #   boundary = 'fuel_top'
-  #   type = TemperatureOutflowBC
-  #   variable = temp
-  #   velocity = '0 ${flow_velocity} 0'
   # [../]
   [./temp_advection_outlet]
     boundary = 'fuel_top'
@@ -499,8 +520,8 @@ ini_neut=1e12
   type = Transient
   end_time = 100
 
-#  nl_rel_tol = 1e-6
-#  nl_abs_tol = 1e-6
+  nl_rel_tol = 1e-6
+  nl_abs_tol = 1e-6
 
   solve_type = 'NEWTON'
   petsc_options = '-snes_converged_reason -ksp_converged_reason -snes_linesearch_monitor'
@@ -580,6 +601,13 @@ ini_neut=1e12
     block = 'fuel'
     outputs = 'exodus console csv'
   [../]
+  [./max_temp_fuel]
+    type = ElementExtremeValue
+    variable = temp
+    block = 'fuel'
+    value_type = 'max'
+    outputs = 'exodus console csv'
+  [../]
   [./temp_blanket]
     type = ElementAverageValue
     variable = temp
@@ -599,6 +627,12 @@ ini_neut=1e12
   [./heat]
     type = ElmIntegTotFissHeatPostprocessor
     outputs = 'csv'
+  [../]
+  [./coreEndTemp]
+    type = SideAverageValue
+    variable = temp
+    boundary = 'fuel_top'
+    outputs = 'exodus console'
   [../]
 []
 
@@ -621,44 +655,7 @@ ini_neut=1e12
     app_type = MoltresApp
     execute_on = timestep_begin
     positions = '200.0 200.0 0.0'
-    input_files = 'sub-parabolic-vel.i'
+    input_files = 'sub-hx.i'
   [../]
 []
 
-[ICs]
-  [./temp_ic]
-    type = ConstantIC
-    variable = temp
-    value = ${ini_temp}
-  [../]
-  [./group1_ic]
-    type = ConstantIC
-    variable = group1
-    value = ${ini_neut}
-  [../]
-  [./group2_ic]
-    type = ConstantIC
-    variable = group2
-    value = ${ini_neut}
-  [../]
-  [./group3_ic]
-    type = ConstantIC
-    variable = group3
-    value = ${ini_neut}
-  [../]
-  [./group4_ic]
-    type = ConstantIC
-    variable = group4
-    value = ${ini_neut}
-  [../]
-  [./group5_ic]
-    type = ConstantIC
-    variable = group5
-    value = ${ini_neut}
-  [../]
-  [./group6_ic]
-    type = ConstantIC
-    variable = group6
-    value = ${ini_neut}
-  [../]
-[]

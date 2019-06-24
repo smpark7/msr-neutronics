@@ -1,5 +1,5 @@
 pre_flow_velocity=112.75
-pre_scale=1e-4    # precursor scaling factor
+pre_scale=1e-12    # precursor scaling factor
 
 [GlobalParams]
   num_groups = 0
@@ -13,28 +13,29 @@ pre_scale=1e-4    # precursor scaling factor
 []
 
 [Mesh]
-  type = GeneratedMesh
-  dim = 2
-  nx = 1
-  ny = 600
-  xmax = 112.75
-  ymax = 188
-  elem_type = QUAD
+#  type = GeneratedMesh
+#  dim = 1
+#  nx = 600
+#  xmax = 188
+#  elem_type = EDGE2
+  file = '../msfr-hx-el_out_loopApp0.e'
 [../]
 
 [Variables]
   [./temp]
-    order = FIRST
-    family = LAGRANGE
+    order = CONSTANT
+    family = MONOMIAL
     scaling = 1
+    initial_condition = 923
+    initial_from_file_var = temp
+    initial_from_file_timestep = LATEST
   [../]
 []
 
 [Precursors]
   [./core]
     var_name_base = pre
-    outlet_boundaries = 'top'
-    constant_velocity_values = true
+    outlet_boundaries = 'right'
     u_def = 0
     v_def = ${pre_flow_velocity}
     w_def = 0
@@ -44,8 +45,9 @@ pre_scale=1e-4    # precursor scaling factor
     loop_precs = true
     multi_app = loopApp
     is_loopapp = true
-    inlet_boundaries = 'bottom'
+    inlet_boundaries = 'left'
     scaling = ${pre_scale}
+    init_from_file = true
   [../]
 []
 
@@ -56,30 +58,43 @@ pre_scale=1e-4    # precursor scaling factor
   [../]
 []
 
-[Functions]
-  [./velFunc]
-    type = ParsedFunction
-    value = '(2 / 112.75 / 10) * (112.75 ^ 2 - (x ^ 2)) + 101.475'
-  [../]
-  [./nullFunc]
-    type = ParsedFunction
-    value = '0'
+[DGKernels]
+  [./temp_adv]
+    type = DGTemperatureAdvection
+    variable = temp
+    velocity = '${pre_flow_velocity} 0 0'
   [../]
 []
 
-[Controls]
-  [./flowControl]
-    type = RealFunctionControl
-    parameter = '*/*/vv'
-    function = velFunc
-    execute_on = 'initial timestep_begin'
+[DiracKernels]
+  [./heat_exchanger]
+    type = DiracHX
+    variable = temp
+    power = 5e4
+    point = '94 0 0'
+  [../]
+[]
+
+[BCs]
+  [./fuel_bottom]
+    boundary = 'left'
+    type = PostprocessorTemperatureInflowBC
+    postprocessor = coreEndTemp
+    variable = temp
+    uu = ${pre_flow_velocity}
+  [../]
+  [./temp_advection_outflow]
+    boundary = 'right'
+    type = TemperatureOutflowBC
+    variable = temp
+    velocity = '${pre_flow_velocity} 0 0'
   [../]
 []
 
 [Materials]
   [./fuel]
     type = GenericMoltresMaterial
-    property_tables_root = '../../input-data/mc-paper/xs-data/data/mc_paper_fuel_'
+    property_tables_root = '../../../input-data/mc-paper/xs-data/data-el/el_fuel_'
     interp_type = 'spline'
     prop_names = 'cp'
     prop_values = '1355'
@@ -130,13 +145,34 @@ pre_scale=1e-4    # precursor scaling factor
   [../]
 []
 
+[Postprocessors]
+  [./temp_loop]
+    type = ElementAverageValue
+    variable = temp
+    outputs = 'exodus console'
+  [../]
+  [./loopEndTemp]
+    type = SideAverageValue
+    variable = temp
+    boundary = 'right'
+  [../]
+  [./coreEndTemp]
+    type = Receiver
+  [../]
+  [./loopMinTemp]
+    type = ElementExtremeValue
+    value_type = min
+    variable = temp
+    outputs = 'exodus console'
+  [../]
+[]
+
 [Outputs]
   perf_graph = true
   print_linear_residuals = true
   [./exodus]
     type = Exodus
-    file_base = 'sub'
-    execute_on = 'timestep_begin'
+    execute_on = 'timestep_end'
   [../]
 []
 

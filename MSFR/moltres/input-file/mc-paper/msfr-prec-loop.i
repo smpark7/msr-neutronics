@@ -1,10 +1,10 @@
-flow_velocity=112.75 # cm/s
-pre_flow_velocity=112.75
+flow_velocity=132.75 # cm/s
+pre_flow_velocity=132.75
 nt_scale=1e-15     # neutron flux scaling factor
 pre_scale=1e-12    # precursor scaling factor
 ini_temp=973     # initial temp
 diri_temp=973    # dirichlet BC temp
-ini_neut=1e14
+ini_neut=1e12
 
 [GlobalParams]
   num_groups = 6
@@ -477,7 +477,7 @@ ini_neut=1e14
     type = IterationAdaptiveDT
     dt = 1e-6
     cutback_factor = .5
-    growth_factor = 1.2
+    growth_factor = 1.05
     optimal_iterations = 25
   [../]
 []

@@ -125,7 +125,7 @@ pre_scale=1e-4    # precursor scaling factor
 
 [Preconditioning]
   [./SMP]
-    type = FDP
+    type = SMP
     full = true
   [../]
 []

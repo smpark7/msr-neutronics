@@ -4,7 +4,7 @@ nt_scale=1e-15     # neutron flux scaling factor
 pre_scale=1e-12    # precursor scaling factor
 ini_temp=973     # initial temp
 diri_temp=973    # dirichlet BC temp
-ini_neut=1e14
+ini_neut=1e12
 
 [GlobalParams]
   num_groups = 6
@@ -307,6 +307,7 @@ ini_neut=1e14
   # [../]
   [./temp_advection_fuel]
     type = CtrlConservativeTemperatureAdvection
+    upwinding_type = full
     u_val = 0
     v_val = ${flow_velocity} # this will be changed in ctrls block
     w_val = 0
@@ -361,7 +362,7 @@ ini_neut=1e14
   [./k_fuel]
     type = ParsedMaterial
     f_name = k
-    function = '(0.928 + 8.397e-5 * temp) * .01'
+    function = '(0.928 + 8.397e-5 * temp) * .1'    # original x10
     args = 'temp'
     block = 'fuel'
   [../]
@@ -498,8 +499,8 @@ ini_neut=1e14
   type = Transient
   end_time = 100
 
-  nl_rel_tol = 1e-6
-  nl_abs_tol = 1e-6
+#  nl_rel_tol = 1e-6
+#  nl_abs_tol = 1e-6
 
   solve_type = 'NEWTON'
   petsc_options = '-snes_converged_reason -ksp_converged_reason -snes_linesearch_monitor'
@@ -526,7 +527,7 @@ ini_neut=1e14
 
 [Preconditioning]
   [./FDP]
-    type = FDP
+    type = SMP
     full = true
   [../]
 []

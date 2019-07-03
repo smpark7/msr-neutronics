@@ -397,28 +397,6 @@ ini_neut=1e12
     args = 'temp'
     block = 'blanket'
   [../]
-  # [./struc]
-  #   type = GenericMoltresMaterial
-  #   property_tables_root = '../../input-data/mc-paper/xs-data/data/mc_paper_struc_'
-  #   interp_type = 'spline'
-  #   block = 'struc'
-  #   prop_names = 'k cp'     # conductivity, capacity
-  #   prop_values = '.25 560'   # W cm-1 K-1, J kg-1 K-1
-  # [../]
-  # [./rho_struc]
-  #   type = ParsedMaterial
-  #   f_name = rho
-  #   function = '.01'
-  #   args = 'temp'
-  #   block = 'struc'
-  # [../]
-  # [./drho_struc]
-  #   type = ParsedMaterial
-  #   f_name = 'drho/dtemp'
-  #   function = '0'
-  #   args = 'temp'
-  #   block = 'struc'
-  # [../]
 []
 
 [BCs]
@@ -428,12 +406,6 @@ ini_neut=1e12
     variable = temp
     value = ${diri_temp}
   [../]
-  # [./temp_top]
-  #   boundary = 'struc_top'
-  #   type = DirichletBC
-  #   variable = temp
-  #   value = ${struc_diri_temp}
-  # [../]
   [./temp_outer]
     boundary = 'outer'
     type = DirichletBC
@@ -563,17 +535,6 @@ ini_neut=1e12
     variable = group6
     outputs = 'console exodus csv'
   [../]
-#   [./group1_old]
-#     type = IntegralOldVariablePostprocessor
-#     variable = group1
-#     outputs = 'console exodus'
-#   [../]
-#   [./multiplication]
-#     type = DivisionPostprocessor
-#     value1 = group1_current
-#     value2 = group1_old
-#     outputs = 'console exodus'
-#   [../]
   [./temp_fuel]
     type = ElementAverageValue
     variable = temp

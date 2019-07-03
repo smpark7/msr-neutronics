@@ -2,9 +2,9 @@ flow_velocity=112.75 # cm/s
 pre_flow_velocity=112.75
 nt_scale=1e-15     # neutron flux scaling factor
 pre_scale=1e-12    # precursor scaling factor
-ini_temp=973     # initial temp
-diri_temp=973    # dirichlet BC temp
-ini_neut=1e12
+ini_temp=923     # initial temp
+diri_temp=923    # dirichlet BC temp
+ini_neut=1e14
 
 [GlobalParams]
   num_groups = 6
@@ -63,7 +63,7 @@ ini_neut=1e12
   [./temp]
     order = FIRST
     family = LAGRANGE
-    scaling = 1e-6
+    scaling = 1
   [../]
 []
 
@@ -299,53 +299,18 @@ ini_neut=1e12
     nt_scale=1
     variable = temp
   [../]
-  # [./temp_advection_fuel]
-  #   type = ConservativeTemperatureAdvection
-  #   velocity = '0 ${flow_velocity} 0'
-  #   variable = temp
-  #   block = 'fuel'
-  # [../]
   [./temp_advection_fuel]
-    type = CtrlConservativeTemperatureAdvection
-    upwinding_type = none
-    u_val = 0
-    v_val = ${flow_velocity} # this will be changed in ctrls block
-    w_val = 0
+    type = ConservativeTemperatureAdvection
+    velocity = '0 ${flow_velocity} 0'
     variable = temp
     block = 'fuel'
-  [../]
-[]
-
-[Functions]
-  [./velFunc]
-    type = ParsedFunction
-    value = '(2 / 112.75 / 10) * (112.75 ^ 2 - (x ^ 2)) + 101.475'
-  [../]
-  [./nullFunc]
-    type = ParsedFunction
-    value = '0'
-  [../]
-[]
-
-[Controls]
-  [./flowControl]
-    type = RealFunctionControl
-    parameter = '*/*/v_val'
-    function = velFunc
-    execute_on = 'initial timestep_begin'
-  [../]
-  [./flowControl2]
-    type = RealFunctionControl
-    parameter = '*/*/vv'
-    function = velFunc
-    execute_on = 'initial timestep_begin'
   [../]
 []
 
 [Materials]
   [./fuel]
     type = GenericMoltresMaterial
-    property_tables_root = '../../input-data/mc-paper/xs-data/data/mc_paper_fuel_'
+    property_tables_root = '../../input-data/mc-paper/xs-data/data-og/og_fuel_'
     interp_type = 'spline'
     prop_names = 'cp'
     prop_values = '1355'
@@ -362,7 +327,7 @@ ini_neut=1e12
   [./k_fuel]
     type = ParsedMaterial
     f_name = k
-    function = '(0.928 + 8.397e-5 * temp) * .01'    # J cm-1 K-1
+    function = '(0.928 + 8.397e-5 * temp) * .01'
     args = 'temp'
     block = 'fuel'
   [../]
@@ -376,7 +341,7 @@ ini_neut=1e12
   [../]
   [./blanket]
     type = GenericMoltresMaterial
-    property_tables_root = '../../input-data/mc-paper/xs-data/data/mc_paper_blanket_'
+    property_tables_root = '../../input-data/mc-paper/xs-data/data-og/og_blanket_'
     interp_type = 'spline'
     prop_names = 'cp'
     prop_values = '1355'
@@ -422,11 +387,17 @@ ini_neut=1e12
 []
 
 [BCs]
-  [./temp]
-    boundary = 'fuel_bottom blanket_bottom'
+  [./temp_diri]
+    boundary = 'blanket_bottom'
     type = DirichletBC
     variable = temp
     value = ${diri_temp}
+  [../]
+  [./temp_fuel_bottom]
+    boundary = 'fuel_bottom'
+    type = PostprocessorDirichletBC
+    postprocessor = inlet_mean_temp
+    variable = temp
   [../]
   # [./temp_top]
   #   boundary = 'struc_top'
@@ -449,19 +420,11 @@ ini_neut=1e12
   #   ww = '0'
   #   inlet_conc = ${diri_temp}
   # [../]
-  # [./temp_advection_outlet]
-  #   boundary = 'fuel_top'
-  #   type = TemperatureOutflowBC
-  #   variable = temp
-  #   velocity = '0 ${flow_velocity} 0'
-  # [../]
   [./temp_advection_outlet]
     boundary = 'fuel_top'
-    type = VelocityFunctionTemperatureOutflowBC
+    type = TemperatureOutflowBC
     variable = temp
-    vel_x_func = nullFunc
-    vel_y_func = velFunc
-    vel_z_func = nullFunc
+    velocity = '0 ${flow_velocity} 0'
   [../]
   [./vacuum_group1]
     type = VacuumConcBC
@@ -499,9 +462,6 @@ ini_neut=1e12
   type = Transient
   end_time = 100
 
-#  nl_rel_tol = 1e-6
-#  nl_abs_tol = 1e-6
-
   solve_type = 'NEWTON'
   petsc_options = '-snes_converged_reason -ksp_converged_reason -snes_linesearch_monitor'
   petsc_options_iname = '-pc_type -pc_factor_shift_type'
@@ -509,9 +469,6 @@ ini_neut=1e12
   line_search = 'none'
    # petsc_options_iname = '-snes_type'
   # petsc_options_value = 'test'
-
-  nl_max_its = 30
-  l_max_its = 100
 
   dtmin = 1e-6
   # dtmax = 1
@@ -580,6 +537,13 @@ ini_neut=1e12
     block = 'fuel'
     outputs = 'exodus console csv'
   [../]
+  [./max_temp_fuel]
+    type = ElementExtremeValue
+    variable = temp
+    block = 'fuel'
+    value_type = 'max'
+    outputs = 'exodus console csv'
+  [../]
   [./temp_blanket]
     type = ElementAverageValue
     variable = temp
@@ -599,6 +563,18 @@ ini_neut=1e12
   [./heat]
     type = ElmIntegTotFissHeatPostprocessor
     outputs = 'csv'
+  [../]
+  [./coreEndTemp]
+    type = SideAverageValue
+    variable = temp
+    boundary = 'fuel_top'
+    outputs = 'exodus console'
+  [../]
+  [./inlet_mean_temp]
+    type = Receiver
+    default = 923
+    initialize_old = true
+    execute_on = 'timestep_begin'
   [../]
 []
 
@@ -621,7 +597,25 @@ ini_neut=1e12
     app_type = MoltresApp
     execute_on = timestep_begin
     positions = '200.0 200.0 0.0'
-    input_files = 'sub-parabolic-vel.i'
+    input_files = 'sub-og.i'
+  [../]
+[]
+
+[Transfers]
+  [./from_loop]
+    type = MultiAppPostprocessorTransfer
+    multi_app = loopApp
+    from_postprocessor = loopEndTemp
+    to_postprocessor = inlet_mean_temp
+    direction = from_multiapp
+    reduction_type = maximum
+  [../]
+  [./to_loop]
+    type = MultiAppPostprocessorTransfer
+    multi_app = loopApp
+    from_postprocessor = coreEndTemp
+    to_postprocessor = coreEndTemp
+    direction = to_multiapp
   [../]
 []
 

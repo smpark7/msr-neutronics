@@ -20,7 +20,7 @@ ini_neut=1e14
 []
 
 [Mesh]
-  file = 'fuel-blanket-fine.e'
+  file = 'fuel-blanket-super-fine.e'
 [../]
 
 [Problem]

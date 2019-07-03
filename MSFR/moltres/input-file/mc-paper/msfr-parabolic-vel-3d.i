@@ -20,13 +20,11 @@ ini_neut=1e12
 []
 
 [Mesh]
-  file = 'fuel-blanket-fine.e'
+  file = 'fuel-blanket-3d.e'
 [../]
 
 [Problem]
   type = FEProblem
-  coord_type = RZ
-  rz_coord_axis = Y
 []
 
 [Variables]
@@ -75,8 +73,8 @@ ini_neut=1e12
     # prec_scale = 1
     constant_velocity_values = true
     u_def = 0
-    v_def = ${pre_flow_velocity}
-    w_def = 0
+    v_def = 0
+    w_def = ${pre_flow_velocity}
     nt_exp_form = false
     family = MONOMIAL
     order = CONSTANT
@@ -301,7 +299,7 @@ ini_neut=1e12
   [../]
   # [./temp_advection_fuel]
   #   type = ConservativeTemperatureAdvection
-  #   velocity = '0 ${flow_velocity} 0'
+  #   velocity = '0 0 ${flow_velocity}'
   #   variable = temp
   #   block = 'fuel'
   # [../]
@@ -309,8 +307,8 @@ ini_neut=1e12
     type = CtrlConservativeTemperatureAdvection
     upwinding_type = none
     u_val = 0
-    v_val = ${flow_velocity} # this will be changed in ctrls block
-    w_val = 0
+    v_val = 0
+    w_val = ${flow_velocity} # this will be changed in ctrls block
     variable = temp
     block = 'fuel'
   [../]
@@ -319,7 +317,7 @@ ini_neut=1e12
 [Functions]
   [./velFunc]
     type = ParsedFunction
-    value = '(2 / 112.75 / 10) * (112.75 ^ 2 - (x ^ 2)) + 101.475'
+    value = '(2 / 112.75 / 10) * (112.75 ^ 2 - (x ^ 2) - (y ^ 2)) + 101.475'
   [../]
   [./nullFunc]
     type = ParsedFunction
@@ -330,13 +328,13 @@ ini_neut=1e12
 [Controls]
   [./flowControl]
     type = RealFunctionControl
-    parameter = '*/*/v_val'
+    parameter = '*/*/w_val'
     function = velFunc
     execute_on = 'initial timestep_begin'
   [../]
   [./flowControl2]
     type = RealFunctionControl
-    parameter = '*/*/vv'
+    parameter = '*/*/ww'
     function = velFunc
     execute_on = 'initial timestep_begin'
   [../]
@@ -460,8 +458,8 @@ ini_neut=1e12
     type = VelocityFunctionTemperatureOutflowBC
     variable = temp
     vel_x_func = nullFunc
-    vel_y_func = velFunc
-    vel_z_func = nullFunc
+    vel_y_func = nullFunc
+    vel_z_func = velFunc
   [../]
   [./vacuum_group1]
     type = VacuumConcBC

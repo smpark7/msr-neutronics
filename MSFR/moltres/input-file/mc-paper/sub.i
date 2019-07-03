@@ -1,4 +1,4 @@
-pre_flow_velocity=132.75
+pre_flow_velocity=112.75
 pre_scale=1e-12    # precursor scaling factor
 
 [GlobalParams]

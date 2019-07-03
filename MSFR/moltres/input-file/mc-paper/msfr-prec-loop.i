@@ -1,9 +1,9 @@
-flow_velocity=132.75 # cm/s
-pre_flow_velocity=132.75
+flow_velocity=112.75 # cm/s
+pre_flow_velocity=112.75
 nt_scale=1e-15     # neutron flux scaling factor
 pre_scale=1e-12    # precursor scaling factor
-ini_temp=973     # initial temp
-diri_temp=973    # dirichlet BC temp
+ini_temp=933     # initial temp
+diri_temp=933    # dirichlet BC temp
 ini_neut=1e12
 
 [GlobalParams]
